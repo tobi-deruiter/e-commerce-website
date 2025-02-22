@@ -11,10 +11,10 @@ router.post("/", upload.single("file"), async (req, res) => {
         const b64 = Buffer.from(req.file.buffer).toString("base64");
         let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
         const cldRes = await handleUpload(dataURI);
-        res.json(cldRes);
+        res.status(200).json(cldRes);
     } catch (error) {
         console.log(error);
-        res.send({
+        res.status(400).send({
             message: error.message,
         });
     }
