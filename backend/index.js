@@ -37,7 +37,7 @@ app.use('/images', express.static('upload/images'))
 app.post("/upload", upload.single('product'), (req, res)=>{
     res.json({
         success: 1,
-        image_url: `http://localhost:${port}/images/${req.file.filename}`
+        image_url: `https://api.ecommerce.tobi-deruiter.info/images/${req.file.filename}`
     })
 })
 
@@ -98,6 +98,14 @@ app.post('/addproduct', async (req, res)=>{
         success: true,
         name: req.body.name,
     })
+})
+
+app.get('/getallproducts', async (req, res)=>{
+    let products = await Product.find({});
+    products.forEach(product => {
+        console.log(product)
+    });
+    res.send(products[products.length-1].image)
 })
 
 app.listen(port, (error)=>{
