@@ -1,11 +1,11 @@
 const mongoose = require("./config");
 
 const Product = mongoose.model("Product", {
-    id: {
-        type: Number,
+    title: {
+        type: String,
         required: true,
     },
-    name: {
+    description: {
         type: String,
         required: true,
     },
@@ -25,13 +25,21 @@ const Product = mongoose.model("Product", {
         type: Number,
         required: true,
     },
-    date: {
-        type: Date,
-        default: Date.now,
-    },
     available: {
         type: Boolean,
         default: true,
+    },
+    quantity: {
+        type: Number,
+        default: -1,
+    },
+    sales: {
+        type: Number,
+        default: 0,
+    },
+    date: {
+        type: Date,
+        default: Date.now,
     },
 })
 
