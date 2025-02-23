@@ -4,7 +4,7 @@ const handleDestroy = require("../../utils/cloudinary/handleDestroy")
 
 router.post("/", async (req, res) => {
     try {
-        const cldRes = await handleDestroy(req.body.public_id, req.body.recource_type);
+        const cldRes = await handleDestroy(req.body.public_id, req.body.resource_type);
         res.status(200).json(cldRes);
     } catch (error) {
         console.log(error);

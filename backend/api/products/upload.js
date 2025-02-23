@@ -20,6 +20,7 @@ router.post('/', async (req, res)=>{
     });
     res.status(200).json({
         success: true,
+        product_id: product._id
     })
 })
 
