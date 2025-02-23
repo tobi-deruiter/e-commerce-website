@@ -13,8 +13,8 @@ router.get('/', async (req, res)=>{
     const max_quantity = (!req.body.max_quantity) ? Number.POSITIVE_INFINITY : req.body.max_quantity;
     const min_sales = (!req.body.min_quantity) ? Number.NEGATIVE_INFINITY : req.body.min_sales;
     const max_sales = (!req.body.max_quantity) ? Number.POSITIVE_INFINITY : req.body.max_sales;
-    const min_date = (!req.body.min_quadate) ? new Date(-8640000000000000) : req.body.min_date;
-    const max_date = (!req.body.max_quadate) ? new Date(8640000000000000) : req.body.max_date;
+    const min_date = (!req.body.min_date) ? new Date(-8640000000000000) : new Date(req.body.min_date);
+    const max_date = (!req.body.max_date) ? new Date(8640000000000000) : new Date(req.body.max_date);
 
     const sort = (!req.body.sort) ? "relevance" : req.body.sort;
     
