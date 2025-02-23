@@ -2,6 +2,6 @@ const express = require("express");
 const router = express.Router();
 
 router.use("/upload", require("./upload"));
-router.use("/get", require("./get"));
+router.use("/search", require("./search"));
 
 module.exports = router
