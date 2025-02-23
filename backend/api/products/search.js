@@ -98,7 +98,7 @@ router.get('/', async (req, res)=>{
 
 router.get('/by_ids', async (req, res)=>{
     // TODO: check req.body parts
-    let products = await Product.find({
+    const products = await Product.find({
         _id: { $in: req.body.product_ids }
     }).catch(err => {
         console.log("Could not get products: " + err)
