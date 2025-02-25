@@ -82,4 +82,11 @@ router.post("/update-one", uploadFile, async (req, res) => {
     res.status(200).send({ success: true });
 });
 
+router.post("/update-many", async(req, res) => {
+    const productData = req.body;
+    const updateResult = await ProductController.updateManyProducts(productData);
+    const status = (!updateResult.success) ? 500 : 200;
+    res.status(status).send(updateResult);
+})
+
 module.exports = router
