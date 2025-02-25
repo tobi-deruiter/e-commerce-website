@@ -4,7 +4,7 @@ const ProductController = require("../controllers/product.controller")
 const FileController = require("../controllers/file.controller")
 const uploadFile = require("../middlewares/file.upload.middleware")
 
-// default /products endpoint is to search products
+// default /products endpoint is to search products by search term with filters and sorting
 router.get("/", async (req, res) => {
     const searchData = req.body;
     const searchResult = await ProductController.searchProducts(searchData);
@@ -12,6 +12,7 @@ router.get("/", async (req, res) => {
     res.status(status).send(searchResult);
 });
 
+// search by id instead of by search term/filters/sorting
 router.get("/search-by-id", async (req, res) => {
     const productData = req.body;
     const searchByIdResult = await ProductController.getProductsById(productData);
@@ -43,7 +44,7 @@ router.post("/delete", async (req, res) => {
         return res.status(500).send(deleteResult);
     }
 
-    deleteResult.products.forEach(async product => {
+    await deleteResult.products.forEach(async product => {
         const imageData = {
             public_id: product.image_id,
             resource_type: "image"
@@ -67,13 +68,15 @@ router.post("/update-one", uploadFile, async (req, res) => {
         return res.status(500).send(updateResult);
     }
 
-    const imageData = {
-        public_id: updateResult.oldImageId,
-        resource_type: "image"
-    };
-    const deleteAssociatedImageResult = await FileController.deleteFile(imageData)
-    if (!deleteAssociatedImageResult.success) {
-        return res.status(500).send(deleteResult);
+    if (updateResult.oldImageId) {
+        const imageData = {
+            public_id: updateResult.oldImageId,
+            resource_type: "image"
+        };
+        const deleteAssociatedImageResult = await FileController.deleteFile(imageData)
+        if (!deleteAssociatedImageResult.success) {
+            return res.status(500).send(deleteAssociatedImageResult);
+        }
     }
 
     res.status(200).send({ success: true });

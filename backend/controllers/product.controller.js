@@ -11,10 +11,13 @@ class ProductController {
      * 
      * By defualt this will return all products.
      * 
-     * @param {*} req 
-     * @param {*} res 
+     * @param {*} searchData 
      */
     static async searchProducts(searchData) {
+        let result = {
+            success: true,
+        };
+
         const searchRegex = (!searchData.search) ? ".*" : searchData.search;
         const search = new RegExp(searchRegex, 'i');
         const tags = (!searchData.tags) ? await Product.distinct("tags") : searchData.tags;
@@ -69,9 +72,9 @@ class ProductController {
             }}
         ]).catch(err => {
             console.log("Could not get products: " + err)
-            return {
+            result = {
                 success: false,
-                error: err,
+                error: err.message,
             };
         });
 
@@ -105,7 +108,8 @@ class ProductController {
                 break;
         }
 
-        return {
+        return (!result.success) ? result : 
+        {
             success: true,
             products: products,
         };
@@ -115,21 +119,25 @@ class ProductController {
      * This function will return all products with the given product ids in the array
      *      productData.product_ids
      * 
-     * @param {*} req 
-     * @param {*} res 
+     * @param {*} productData 
      */
     static async getProductsById(productData) {
+        let result = {
+            success: true,
+        };
+
         const products = await Product.find({
             _id: { $in: productData.product_ids }
         }).catch(err => {
             console.log("Could not get products: " + err)
-            return {
+            result = {
                 success: false,
-                error: err,
+                error: err.message,
             };
         });
     
-        return {
+        return (!result.success) ? result :
+        {
             success: true,
             products: products,
         };
@@ -143,10 +151,14 @@ class ProductController {
      *      Description: String
      *      Image
      * 
-     * @param {*} req 
-     * @param {*} res 
+     * @param {*} productData 
+     * @param {*} productImageData 
      */
     static async uploadProduct(productData, productImageData) {
+        let result = {
+            success: true,
+        };
+
         const product = new Product({
             title: productData.title,
             description: productData.description,
@@ -156,21 +168,27 @@ class ProductController {
             price: productData.price,
         });
         await product.save().catch(err => {
-            console.log("Could not save product: " + err)
-            return {
+            console.log("Could not save product: " + err);
+            result = {
                 success: false,
-                error: err,
+                error: err.message,
             };
         });
-        return {
+
+        return (!result.success) ? result :
+        {
             success: true,
             product_id: product._id
         };
     }
 
     static async deleteProducts(productData) {
-        if (!productData.product_ids) {
-            return {
+        let result = {
+            success: true,
+        };
+
+        if (!productData.product_ids || productData.product_ids.length == 0) {
+            result = {
                 success: false,
                 error: "No ids given",
             };
@@ -178,30 +196,37 @@ class ProductController {
         const products = await Product.find({
             _id: { $in: productData.product_ids }
         }).catch(err => {
-            return {
+            console.log(err);
+            result = {
                 success: false,
-                error: err,
+                error: err.message,
             };
         });
         
         Product.deleteMany({
             _id: { $in: productData.product_ids }
         }).catch(err => {
-            return {
+            console.log(err);
+            result = {
                 success: false,
-                error: err,
+                error: err.message,
             };
         });
     
-        return {
+        return (!result.success) ? result :
+        {
             success: true,
             products: products,
         };
     }
 
     static async updateProduct(productData, productImageData) {
+        let result = {
+            success: true,
+        };
+
         if (!productData.product_id) {
-            return {
+            result = {
                 success: false,
                 error: "Update product: no id given.",
             };
@@ -209,9 +234,9 @@ class ProductController {
     
         const product = await Product.findById(productData.product_id).catch(err => {
             console.log("Could not get product: " + err)
-            return {
+            result = {
                 success: false,
-                error: err,
+                error: err.message,
             };
         });
     
@@ -223,20 +248,21 @@ class ProductController {
         product.quantity = (!productData.quantity) ? product.quantity : productData.quantity;
     
         // save old image id to delete later if it is being replaced by a new image
-        const oldImageId = (!productImageData.image_id) ? "" : product.image_id;
+        const oldImageId = (!productImageData.file_id) ? null : product.image_id;
         
-        product.image_id = (!productImageData.image_id) ? product.image_id : productImageData.image_id;
-        product.image_url = (!productImageData.image_url) ? product.image_url : productImageData.image_url;
+        product.image_id = (!productImageData.file_id) ? product.image_id : productImageData.file_id;
+        product.image_url = (!productImageData.file_url) ? product.image_url : productImageData.file_url;
 
         await product.save().catch(err => {
             console.log("Could not save product: " + err)
-            return {
+            result = {
                 success: false,
-                error: err,
+                error: err.message,
             };
         });
 
-        return {
+        return (!result.success) ? result :
+        {
             success: true,
             oldImageId: oldImageId
         };
