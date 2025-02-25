@@ -1,4 +1,4 @@
-const mongoose = require("./config");
+const mongoose = require("../configs/mongodb.config");
 
 const Product = mongoose.model("Product", {
     title: {
