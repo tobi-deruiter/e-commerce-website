@@ -277,6 +277,21 @@ class ProductController {
             }
         }
     }
+
+    static async getTags() {
+        try {
+            return {
+                success: true,
+                tags: await Product.distinct("tags"),
+            };
+        } catch (err) {
+            console.log(err);
+            return {
+                success: false,
+                error: err.message,
+            }
+        }
+    }
 }
 
 module.exports = ProductController;

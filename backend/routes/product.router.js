@@ -21,6 +21,13 @@ router.get("/search-by-id", uploadFormData, async (req, res) => {
     res.status(status).send(searchByIdResult);
 });
 
+// get all current tags
+router.get("/get-tags", async (req, res) => {
+    const currentTags = await ProductController.getTags();
+    const status = (!currentTags.success) ? 500 : 200;
+    res.status(status).send(currentTags);
+});
+
 // get/upload image, upload product with image info
 router.post("/upload", uploadFile, async (req, res) => {
     if (!req.file) {
