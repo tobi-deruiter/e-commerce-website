@@ -32,24 +32,24 @@ class ProductController {
             
             const products = await Product.aggregate([
                 { $match: {
-                    $and: [
+                    $or: [
+                        { title: search },
+                        { tags: search },
+                        { description: search },
                         {
-                            $or: [
-                                { title: search },
-                                { tags: search },
-                                { description: search }
+                            $and: [
+                                { tags: { $in: tags } },
+                                { price: { $gte: min_price } },
+                                { price: { $lte: max_price } },
+                                { available: { $eq: available } },
+                                { quantity: { $gte: min_quantity } },
+                                { quantity: { $lte: max_quantity } },
+                                { sales: { $gte: min_sales } },
+                                { sales: { $lte: max_sales } },
+                                { date: { $gte: min_date } },
+                                { date: { $lte: max_date } },
                             ]
-                        },
-                        { tags: { $in: tags } },
-                        { price: { $gte: min_price } },
-                        { price: { $lte: max_price } },
-                        { available: { $eq: available } },
-                        { quantity: { $gte: min_quantity } },
-                        { quantity: { $lte: max_quantity } },
-                        { sales: { $gte: min_sales } },
-                        { sales: { $lte: max_sales } },
-                        { date: { $gte: min_date } },
-                        { date: { $lte: max_date } },
+                        }
                     ]
                 }},
                 { $set: {
@@ -247,18 +247,25 @@ class ProductController {
             const available = (!productData.available) ? "$available" : productData.available;
             const quantity = (!productData.quantity) ? "$quantity" : productData.quantity;
     
-            Product.updateMany(
+            console.log(tags);
+            console.log(productData.product_ids)
+
+            await Product.updateMany(
                 {
                     _id: { $in: productData.product_ids }
                 },
-                {
-                    title: title,
-                    description: description,
-                    tags: tags,
-                    price: price,
-                    available: available,
-                    quantity: quantity,
-                }
+                [
+                    {
+                        $set: {
+                            title: title,
+                            description: description,
+                            tags: tags,
+                            price: price,
+                            available: available,
+                            quantity: quantity,
+                        }
+                    }
+                ]
             )
 
             return { success: true };
