@@ -3,9 +3,10 @@ const router = express.Router();
 const ProductController = require("../controllers/product.controller")
 const FileController = require("../controllers/file.controller")
 const uploadFile = require("../middlewares/file.upload.middleware")
+const uploadFormData = require("../middlewares/formdata.upload.middleware")
 
 // default /products endpoint is to search products by search term with filters and sorting
-router.get("/", async (req, res) => {
+router.get("/", uploadFormData, async (req, res) => {
     const searchData = req.body;
     const searchResult = await ProductController.searchProducts(searchData);
     const status = (!searchResult.success) ? 500 : 200;
@@ -13,7 +14,7 @@ router.get("/", async (req, res) => {
 });
 
 // search by id instead of by search term/filters/sorting
-router.get("/search-by-id", async (req, res) => {
+router.get("/search-by-id", uploadFormData, async (req, res) => {
     const productData = req.body;
     const searchByIdResult = await ProductController.getProductsById(productData);
     const status = (!searchByIdResult.success) ? 500 : 200;
@@ -37,7 +38,7 @@ router.post("/upload", uploadFile, async (req, res) => {
 });
 
 // get product info, delete product, delete associated image with product info
-router.post("/delete", async (req, res) => {
+router.post("/delete", uploadFormData, async (req, res) => {
     const productData = req.body;
     const deleteResult = await ProductController.deleteProducts(productData);
     if (!deleteResult.success) {
@@ -82,7 +83,8 @@ router.post("/update-one", uploadFile, async (req, res) => {
     res.status(200).send({ success: true });
 });
 
-router.post("/update-many", async(req, res) => {
+router.post("/update-many", uploadFormData, async (req, res) => {
+    console.log(req.body);
     const productData = req.body;
     const updateResult = await ProductController.updateManyProducts(productData);
     const status = (!updateResult.success) ? 500 : 200;
