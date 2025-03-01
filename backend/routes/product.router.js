@@ -7,7 +7,7 @@ const uploadFormData = require("../middlewares/formdata.upload.middleware")
 
 // default /products endpoint is to search products by search term with filters and sorting
 router.get("/", uploadFormData, async (req, res) => {
-    const searchData = req.body;
+    const searchData = req.query;
     const searchResult = await ProductController.searchProducts(searchData);
     const status = (!searchResult.success) ? 500 : 200;
     res.status(status).send(searchResult);
@@ -15,7 +15,7 @@ router.get("/", uploadFormData, async (req, res) => {
 
 // search by id instead of by search term/filters/sorting
 router.get("/search-by-id", uploadFormData, async (req, res) => {
-    const productData = req.body;
+    const productData = req.query;
     const searchByIdResult = await ProductController.getProductsById(productData);
     const status = (!searchByIdResult.success) ? 500 : 200;
     res.status(status).send(searchByIdResult);

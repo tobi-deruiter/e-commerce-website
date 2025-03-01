@@ -17,7 +17,7 @@ class ProductController {
         try {
             const searchRegex = (!searchData.search) ? ".*" : searchData.search;
             const search = new RegExp(searchRegex, 'i');
-            const tags = (!searchData.tags) ? await Product.distinct("tags") : searchData.tags;
+            const tags = (!searchData.tags) ? await Product.distinct("tags") : (typeof searchData.tags === 'object') ? searchData.tags : [searchData.tags];
             const min_price = (!searchData.min_price) ? Number.NEGATIVE_INFINITY : searchData.min_price;
             const max_price = (!searchData.max_price) ? Number.POSITIVE_INFINITY : searchData.max_price;
             const available = (!searchData.available) ? true : searchData.available;
@@ -32,25 +32,44 @@ class ProductController {
             
             const products = await Product.aggregate([
                 { $match: {
-                    $or: [
-                        { title: search },
-                        { tags: search },
-                        { description: search },
+                    $and: [
                         {
-                            $and: [
-                                { tags: { $in: tags } },
-                                { price: { $gte: min_price } },
-                                { price: { $lte: max_price } },
-                                { available: { $eq: available } },
-                                { quantity: { $gte: min_quantity } },
-                                { quantity: { $lte: max_quantity } },
-                                { sales: { $gte: min_sales } },
-                                { sales: { $lte: max_sales } },
-                                { date: { $gte: min_date } },
-                                { date: { $lte: max_date } },
+                            $or: [
+                                { title: search },
+                                { tags: search },
+                                { description: search },
                             ]
-                        }
+                        },
+                        { tags: { $in: tags } },
+                        { price: { $gte: min_price } },
+                        { price: { $lte: max_price } },
+                        { available: { $eq: available } },
+                        { quantity: { $gte: min_quantity } },
+                        { quantity: { $lte: max_quantity } },
+                        { sales: { $gte: min_sales } },
+                        { sales: { $lte: max_sales } },
+                        { date: { $gte: min_date } },
+                        { date: { $lte: max_date } },
                     ]
+                    // $or: [
+                    //     { title: search },
+                    //     { tags: search },
+                    //     { description: search },
+                    //     {
+                    //         $and: [
+                    //             { tags: { $in: tags } },
+                    //             { price: { $gte: min_price } },
+                    //             { price: { $lte: max_price } },
+                    //             { available: { $eq: available } },
+                    //             { quantity: { $gte: min_quantity } },
+                    //             { quantity: { $lte: max_quantity } },
+                    //             { sales: { $gte: min_sales } },
+                    //             { sales: { $lte: max_sales } },
+                    //             { date: { $gte: min_date } },
+                    //             { date: { $lte: max_date } },
+                    //         ]
+                    //     }
+                    // ]
                 }},
                 { $set: {
                     relevance: {

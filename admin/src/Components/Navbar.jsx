@@ -1,0 +1,62 @@
+import React from "react"
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import Container from 'react-bootstrap/Container';
+import Image from 'react-bootstrap/Image';
+import styled from'styled-components';
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import { Link } from 'react-router-dom';
+
+const StyledNavbar = styled(Navbar)`
+    height: ${props => props.height}px;
+    box-shadow: 0px -1px 7px rgba(0,0,0,1);
+`
+
+const NavImage = styled(Image)`
+    max-width: 50px;
+`
+
+const OffCanvasNavbar = styled(Navbar.Offcanvas)`
+    @media (min-width: 992px) {
+        display: none;
+    }
+`
+
+const NAV_BAR = (props) => {
+    return (
+        <>
+            <StyledNavbar expand="lg" height={props.height}>
+                <Container>
+                    <Link as={Link} to="/" ><NavImage src="https://res.cloudinary.com/dbjagmj0q/image/upload/v1740521536/mzhrisf2mnu8mkvehy2j.png" /></Link>
+                    <Navbar.Brand as={Link} to="/" className="me-auto">E-Commerce Website</Navbar.Brand>
+                    <Navbar.Toggle aria-controls={`offcanvasNavbar`} />
+                    <OffCanvasNavbar
+                        id={`offcanvasNavbar`}
+                        aria-labelledby={`offcanvasNavbarLabel`}
+                        placement="start"
+                    >
+                        <Offcanvas.Header closeButton>
+                            <Offcanvas.Title id={`offcanvasNavbarLabel`}>
+                                Menu
+                            </Offcanvas.Title>
+                        </Offcanvas.Header>
+                        <Offcanvas.Body className="d-block">
+                            <Nav>
+                                <Nav.Link as={Link} to="/">Home</Nav.Link>
+                                <NavDropdown title="Portfolios" id="basic-nav-dropdown">
+                                    <NavDropdown.Item as={Link} to="portfolio-first">First Portfolio</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="portfolio-second">Second Portfolio</NavDropdown.Item>
+                                </NavDropdown>
+                                <Nav.Link as={Link} to="/about">About</Nav.Link>
+                            </Nav>
+                        </Offcanvas.Body>
+                    </OffCanvasNavbar>
+                </Container>
+            </StyledNavbar>
+            
+        </>
+    )
+};
+
+export default NAV_BAR;
