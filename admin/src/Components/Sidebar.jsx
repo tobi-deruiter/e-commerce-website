@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 
 const SideNav = styled(Nav)`
     display: block;
-    position: relative;
-    top: 0;
+    position: fixed;
+    top: ${props => props.height}px;
     bottom: 0;
     left: 0;
     padding: 1rem;
