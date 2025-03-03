@@ -13,6 +13,7 @@ import API_Client from "../api/api.client";
 
 const FormContainer = styled.div`
     padding: 4rem;
+    max-width: 1000px;
 `
 
 const AddProductForm = (props) => {
