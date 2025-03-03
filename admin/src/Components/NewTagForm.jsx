@@ -68,7 +68,9 @@ const NewTagForm = (props) => {
                 <InputGroup>
                     <Form.Control
                         type="text"
+                        name="new_tag"
                         placeholder="New Tag"
+                        aria-label="New Tag"
                         value={newTag}
                         onChange={handleNewTag}
                         onKeyDown={handleTabKeyDown}

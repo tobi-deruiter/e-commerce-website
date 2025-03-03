@@ -92,9 +92,6 @@ const AddProductForm = (props) => {
                 formData.append('tags[]', tags[key]);
             }
             formData.append('file', image);
-            // for (var key of formData.entries()) {
-            //     console.log(key[0] + ', ' + key[1]);
-            // }
     
             try {
                 const response = await fetch('http://localhost:4000/products/upload', {
@@ -111,8 +108,8 @@ const AddProductForm = (props) => {
     
                 console.log('Success:', response);
                 setLoading(false);
-            } catch (error) {
-                console.error('Error:', error);
+            } catch (err) {
+                console.error('Error:', err);
             }
         }
     });
@@ -130,6 +127,7 @@ const AddProductForm = (props) => {
                                 type="text"
                                 name="title"
                                 placeholder="Title"
+                                aria-label="Title"
                                 value={formik.values.title}
                                 onChange={handleProductData}
                                 isValid={formik.touched.title && !formik.errors.title}
@@ -149,6 +147,7 @@ const AddProductForm = (props) => {
                                 type="text"
                                 name="price"
                                 placeholder="0.00"
+                                aria-label="Price"
                                 value={formik.values.price}
                                 onChange={handleProductData}
                                 isValid={formik.touched.price && !formik.errors.price}
@@ -169,6 +168,7 @@ const AddProductForm = (props) => {
                                 type="text"
                                 name="description"
                                 placeholder="Description"
+                                aria-label="Description"
                                 value={formik.values.description}
                                 onChange={handleProductData}
                                 isValid={formik.touched.description && !formik.errors.description}
@@ -192,6 +192,7 @@ const AddProductForm = (props) => {
                         type="file"
                         required
                         name="file"
+                        aria-label="File"
                         onChange={handleImage}
                         isValid={formik.touched.file && image}
                         isInvalid={formik.touched.file && !image}

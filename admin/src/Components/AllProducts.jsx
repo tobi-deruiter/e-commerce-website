@@ -22,15 +22,19 @@ const AllProductsItem = styled(Item)`
 `
 
 const AllProducts = (props) => {
-    const [data, setResData] = useState({});
+    const [productsData, setProductsData] = useState({});
 
     const getProducts = async () => {
-        await API_Client.searchProducts().then((data)=>{setResData(data)});
+        await API_Client.searchProducts().then((data)=>{setProductsData(data)});
     }
 
     useEffect(()=>{
         getProducts();
     }, []);
+
+    useEffect(()=>{
+        setProductsData(props.productsData);
+    }, [props.productsData]);
 
     return (
         <AllProductsContainer>
@@ -38,12 +42,12 @@ const AllProducts = (props) => {
             <hr></hr>
             <AllProductsRow>
                 {
-                    data ? 
-                        data.success ?
-                            data.products.map((item, i)=>{
+                    productsData ? 
+                        productsData.success ?
+                            productsData.products.map((item, i)=>{
                                 return <AllProductsItem key={i} id={item._id} image={item.image_url} title={item.title} description={item.description}  />
                             }) :
-                            <p>{data.error}</p>
+                            <p>{productsData.error}</p>
                         :
                         <h1>Loading...</h1>
                 }

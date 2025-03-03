@@ -11,36 +11,44 @@ import AddProduct from "./Pages/AddProduct";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import NAV_BAR from "./Components/Navbar";
 
-const navbarHeight = 60;
+const theme = {
+    navbarHeight: 60,
+}
 
 const SideNavWrapper = styled(Col)`
-    min-height: calc(100vh - ${navbarHeight}px) !important;
+    min-height: calc(100vh - ${theme.navbarHeight}px) !important;
 
     @media (max-width: 992px) {
         display: none;
     }
 `
 
+const ContentWrapper = styled(Col)`
+    margin-top: ${theme.navbarHeight}px;
+`
+
 const App = (props) => {
     return (
-      <Container fluid>
-        <BrowserRouter>
-          <Row>
-            <NAV_BAR height={navbarHeight} />
-          </Row>
-          <Row>
-            <SideNavWrapper xs={2}>
-              <Sidebar height={navbarHeight} />
-            </SideNavWrapper>
-            <Col>
-              <Routes>
-                <Route path='/' element={<Home/>}/>
-                <Route path='/addproduct' element={<AddProduct/>}/>
-              </Routes>
-            </Col>
-          </Row>
-        </BrowserRouter>
-      </Container>
+        <ThemeProvider theme={theme}>
+            <Container fluid>
+                <BrowserRouter>
+                    <Row>
+                        <NAV_BAR />
+                    </Row>
+                    <Row>
+                        <SideNavWrapper xs={2}>
+                            <Sidebar />
+                        </SideNavWrapper>
+                        <ContentWrapper>
+                            <Routes>
+                                <Route path='/' element={<Home />}/>
+                                <Route path='/addproduct' element={<AddProduct/>}/>
+                            </Routes>
+                        </ContentWrapper>
+                    </Row>
+                </BrowserRouter>
+            </Container>
+        </ThemeProvider>
     )
 };
 
