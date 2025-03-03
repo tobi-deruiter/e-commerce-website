@@ -8,13 +8,22 @@ class API_Client {
                 for (const i in searchData[key])
                     query.append(key, searchData[key][i])
         }
+
         return await fetch(`${import.meta.env.VITE_API_URL}/products/?${query}`, {
             method: 'GET',
             headers: {
                 Accept: 'applicatoin/json',
             },
-        })
-        .then((res)=>res.json());
+        }).then((res)=>res.json());
+    }
+
+    static async getProductTags() {
+        return await fetch(`${import.meta.env.VITE_API_URL}/products/get-tags`, {
+            method: 'GET',
+            headers: {
+                Accept: 'applicatoin/json',
+            },
+        }).then((res)=>res.json());
     }
 }
 

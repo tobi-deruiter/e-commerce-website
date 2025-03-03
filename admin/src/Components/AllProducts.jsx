@@ -25,11 +25,7 @@ const AllProducts = (props) => {
     const [data, setResData] = useState({});
 
     const getProducts = async () => {
-        const query = {
-            search: '',
-            tags: ["product"]
-        }
-        await API_Client.searchProducts(query).then((data)=>{setResData(data)});
+        await API_Client.searchProducts().then((data)=>{setResData(data)});
     }
 
     useEffect(()=>{
