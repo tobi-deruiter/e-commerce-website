@@ -9,21 +9,52 @@ class API_Client {
                     query.append(key, searchData[key][i])
         }
 
-        return await fetch(`${import.meta.env.VITE_API_URL}/products/?${query}`, {
-            method: 'GET',
-            headers: {
-                Accept: 'applicatoin/json',
-            },
-        }).then((res)=>res.json());
+        try {
+            return await fetch(`${import.meta.env.VITE_API_URL}/products/?${query}`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'applicatoin/json',
+                },
+            }).then((res)=>res.json());
+        } catch (err) {
+            return {
+                success: false,
+                error: err
+            }
+        }
     }
 
     static async getProductTags() {
-        return await fetch(`${import.meta.env.VITE_API_URL}/products/get-tags`, {
-            method: 'GET',
-            headers: {
-                Accept: 'applicatoin/json',
-            },
-        }).then((res)=>res.json());
+        try {
+            return await fetch(`${import.meta.env.VITE_API_URL}/products/get-tags`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'applicatoin/json',
+                },
+            }).then((res)=>res.json());
+        } catch (err) {
+            return {
+                success: false,
+                error: err
+            }
+        }
+    }
+
+    static async addNewProduct(formData) {
+        try {
+            return await fetch(`${import.meta.env.VITE_API_URL}/products/upload`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'applicatoin/json',
+                },
+                body: formData,
+            }).then((res)=>res.json());
+        } catch (err) {
+            return {
+                success: false,
+                error: err
+            }
+        }
     }
 }
 

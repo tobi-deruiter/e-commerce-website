@@ -94,13 +94,7 @@ const AddProductForm = (props) => {
             formData.append('file', image);
     
             try {
-                const response = await fetch('http://localhost:4000/products/upload', {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'applicatoin/json',
-                    },
-                    body: formData,
-                }).then((res)=>res.json());
+                const response = await API_Client.addNewProduct(formData);
     
                 if (!response.success) {
                     throw new Error(`HTTP error! status: ${response.status}`);
