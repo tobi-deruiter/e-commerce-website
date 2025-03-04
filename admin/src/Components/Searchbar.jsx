@@ -10,6 +10,7 @@ import Row from 'react-bootstrap/Row';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import API_Client from "../api/api.client";
+import ProductTagsSwitches from "./productTagsSwitches";
 
 const CardHeader = styled(Card.Header)`
     display: flex;
@@ -88,6 +89,7 @@ const Searchbar = (props) => {
             setLoading(true);
             const searchData = {
                 search: searchQuery,
+                tags: tags,
             }
 
             try {
@@ -123,7 +125,12 @@ const Searchbar = (props) => {
                     </CardHeader>
                     <Accordion.Collapse eventKey="filter">
                         <Card.Body>
-                            
+                            <Row>
+                                <ProductTagsSwitches onChange={handleTags} tagsData={currentTags} />
+                            </Row>
+                            <Row>
+                                
+                            </Row>
                         </Card.Body>
                     </Accordion.Collapse>
                 </Card>
