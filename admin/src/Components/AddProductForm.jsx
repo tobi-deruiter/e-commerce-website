@@ -184,6 +184,7 @@ const AddProductForm = (props) => {
                     <Form.Label>File</Form.Label>
                     <Form.Control
                         type="file"
+                        accept='image/*'
                         required
                         name="file"
                         aria-label="File"
