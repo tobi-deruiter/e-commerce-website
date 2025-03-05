@@ -57,9 +57,24 @@ class API_Client {
         }
     }
 
-    static async getMaxPrice() {
+
+    static GET_MAX_PRICE = 'price';
+    static GET_MAX_SALES = 'sales';
+    static GET_MAX_QUANTITY = 'quantity';
+    static async getMax(field) {
         const query = new URLSearchParams();
-        query.append('sort', 'highest_price');
+        switch (field) {
+            case API_Client.GET_MAX_PRICE:
+                query.append('sort', 'highest_price');
+                break;
+            case API_Client.GET_MAX_SALES:
+                query.append('sort', 'popular');
+                break;
+            case API_Client.GET_MAX_QUANTITY:
+                query.append('sort', 'highest_quantity');
+                break;
+        }
+        
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/products/?${query}`, {
                 method: 'GET',
@@ -72,7 +87,14 @@ class API_Client {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            return response.products[0].price;
+            switch (field) {
+                case API_Client.GET_MAX_PRICE:
+                    return response.products[0].price;
+                case API_Client.GET_MAX_SALES:
+                    return response.products[0].sales;
+                case API_Client.GET_MAX_QUANTITY:
+                    return response.products[0].quantity;
+            }
         } catch (err) {
             return {
                 success: false,
