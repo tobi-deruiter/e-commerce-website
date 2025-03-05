@@ -18,13 +18,13 @@ class ProductController {
             const searchRegex = (!searchData.search) ? ".*" : searchData.search;
             const search = new RegExp(searchRegex, 'i');
             const tags = (!searchData.tags) ? await Product.distinct("tags") : (typeof searchData.tags === 'object') ? searchData.tags : [searchData.tags];
-            const min_price = (!searchData.min_price) ? Number.NEGATIVE_INFINITY : searchData.min_price;
-            const max_price = (!searchData.max_price) ? Number.POSITIVE_INFINITY : searchData.max_price;
-            const available = (!searchData.available) ? true : searchData.available;
-            const min_quantity = (!searchData.min_quantity) ? Number.NEGATIVE_INFINITY : searchData.min_quantity;
-            const max_quantity = (!searchData.max_quantity) ? Number.POSITIVE_INFINITY : searchData.max_quantity;
-            const min_sales = (!searchData.min_quantity) ? Number.NEGATIVE_INFINITY : searchData.min_sales;
-            const max_sales = (!searchData.max_quantity) ? Number.POSITIVE_INFINITY : searchData.max_sales;
+            const min_price = (!searchData.min_price) ? Number.NEGATIVE_INFINITY : Number(searchData.min_price);
+            const max_price = (!searchData.max_price) ? Number.POSITIVE_INFINITY : Number(searchData.max_price);
+            const available = (!searchData.available) ? true : Boolean(searchData.available);
+            const min_quantity = (!searchData.min_quantity) ? Number.NEGATIVE_INFINITY : Number(searchData.min_quantity);
+            const max_quantity = (!searchData.max_quantity) ? Number.POSITIVE_INFINITY : Number(searchData.max_quantity);
+            const min_sales = (!searchData.min_quantity) ? Number.NEGATIVE_INFINITY : Number(searchData.min_sales);
+            const max_sales = (!searchData.max_quantity) ? Number.POSITIVE_INFINITY : Number(searchData.max_sales);
             const min_date = (!searchData.min_date) ? new Date(-8640000000000000) : new Date(searchData.min_date);
             const max_date = (!searchData.max_date) ? new Date(8640000000000000) : new Date(searchData.max_date);
     
@@ -41,15 +41,11 @@ class ProductController {
                             ]
                         },
                         { tags: { $in: tags } },
-                        { price: { $gte: min_price } },
-                        { price: { $lte: max_price } },
+                        { price: { $gte: min_price, $lte: max_price } },
                         { available: { $eq: available } },
-                        { quantity: { $gte: min_quantity } },
-                        { quantity: { $lte: max_quantity } },
-                        { sales: { $gte: min_sales } },
-                        { sales: { $lte: max_sales } },
-                        { date: { $gte: min_date } },
-                        { date: { $lte: max_date } },
+                        { quantity: { $gte: min_quantity, $lte: max_quantity } },
+                        { sales: { $gte: min_sales, $lte: max_sales } },
+                        { date: { $gte: min_date, $lte: max_date } },
                     ]
                     // $or: [
                     //     { title: search },
