@@ -9,6 +9,7 @@ const DoubleRangeContainer = styled.div`
     position: relative;
     display: flex;
     margin-bottom: 1rem;
+    justify-content: center;
 `
 
 const MinRange = styled(Form.Range)`
@@ -26,16 +27,17 @@ const MaxRange = styled(Form.Range)`
     }
 `
 
-const LeftValueCol = styled(Col)`
-    text-align: right;
+const ValueCol = styled(Col)`
+    max-width: 100px !important;
 `
 
-const RightValueCol = styled(Col)`
-    text-align: left;
+const ValueForm = styled(Form.Control)`
+    text-align: center;
 `
 
 const DoubleRangeForm = (props) => {
     const thumbSize = 16;
+    const widthOffset = 50;
     const [avg, setAvg] = useState((props.min + props.max) / 2);
     const [minVal, setMinVal] = useState(props.min);
     const [maxVal, setMaxVal] = useState(props.max);
@@ -47,13 +49,25 @@ const DoubleRangeForm = (props) => {
     const styles = {
         min: {
             width: minWidth,
-            left: 0
+            left: (widthOffset / 2)
         },
         max: {
             width: thumbSize + ((props.max - avg) / (props.max - props.min)) * (width - 2 * thumbSize),
-            left: minWidth
+            left: minWidth + (widthOffset / 2)
         }
     };
+
+    const handleMinValChange = (e) => {
+        try {
+            setMinVal(Number(e.target.value))
+        } catch (err) {}
+    }
+
+    const handleMaxValChange = (e) => {
+        try {
+            setMaxVal(Number(e.target.value))
+        } catch (err) {}
+    }
 
     useEffect(() => {
         setAvg(Number(((maxVal + minVal) / 2).toFixed(0)));
@@ -66,11 +80,11 @@ const DoubleRangeForm = (props) => {
 
     useEffect(() => {
         if (containerRef.current) {
-            setWidth(containerRef.current.offsetWidth);
+            setWidth(containerRef.current.offsetWidth - 50);
         }
 
         const handleResize = () => {
-            setWidth(containerRef.current.offsetWidth);
+            setWidth(containerRef.current.offsetWidth - 50);
         }
 
         window.addEventListener("resize", handleResize);
@@ -80,11 +94,25 @@ const DoubleRangeForm = (props) => {
     }, [containerRef, isVisible]);
 
     return (
-        <Row>
-            <LeftValueCol xs="1">
-                {minVal}
-            </LeftValueCol>
-            <Col>
+        <div>
+            <Row>
+                <ValueCol>
+                    <ValueForm
+                        type="text"
+                        value={minVal}
+                        onChange={handleMinValChange}
+                    />
+                </ValueCol>
+                <Col></Col>
+                <ValueCol>
+                    <ValueForm
+                        type="text"
+                        value={maxVal}
+                        onChange={handleMaxValChange}
+                    />
+                </ValueCol>
+            </Row>
+            <Row>
                 <DoubleRangeContainer ref={containerRef}>
                     <MinRange
                         type="range"
@@ -94,11 +122,7 @@ const DoubleRangeForm = (props) => {
                         value={minVal}
                         step={props.step ? props.step : 1}
                         style={styles.min}
-                        onChange={({ target }) => {
-                            try {
-                                setMinVal(Number(target.value))
-                            } catch (err) {}
-                        }}
+                        onChange={handleMinValChange}
                     />
                     <MaxRange
                         type="range"
@@ -108,18 +132,11 @@ const DoubleRangeForm = (props) => {
                         value={maxVal}
                         step={props.step ? props.step : 1}
                         style={styles.max}
-                        onChange={({ target }) => {
-                            try {
-                                setMaxVal(Number(target.value))
-                            } catch (err) {}
-                        }}
+                        onChange={handleMaxValChange}
                     />
                 </DoubleRangeContainer>
-            </Col>
-            <RightValueCol xs="1">
-                {maxVal}
-            </RightValueCol>
-        </Row>
+            </Row>
+        </div>
     )
 };
 

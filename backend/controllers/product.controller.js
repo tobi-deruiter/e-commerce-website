@@ -21,12 +21,12 @@ class ProductController {
             const min_price = (!searchData.min_price) ? Number.NEGATIVE_INFINITY : Number(searchData.min_price);
             const max_price = (!searchData.max_price) ? Number.POSITIVE_INFINITY : Number(searchData.max_price);
             const available = (!searchData.available) ? true : Boolean(searchData.available);
-            const min_quantity = (!searchData.min_quantity) ? Number.NEGATIVE_INFINITY : Number(searchData.min_quantity);
+            const min_quantity = (!searchData.min_quantity || Number(searchData.min_quantity) <= 0) ? Number.NEGATIVE_INFINITY : Number(searchData.min_quantity);
             const max_quantity = (!searchData.max_quantity) ? Number.POSITIVE_INFINITY : Number(searchData.max_quantity);
-            const min_sales = (!searchData.min_quantity) ? Number.NEGATIVE_INFINITY : Number(searchData.min_sales);
-            const max_sales = (!searchData.max_quantity) ? Number.POSITIVE_INFINITY : Number(searchData.max_sales);
-            const min_date = (!searchData.min_date) ? new Date(-8640000000000000) : new Date(searchData.min_date);
-            const max_date = (!searchData.max_date) ? new Date(8640000000000000) : new Date(searchData.max_date);
+            const min_sales = (!searchData.min_sales) ? Number.NEGATIVE_INFINITY : Number(searchData.min_sales);
+            const max_sales = (!searchData.max_sales) ? Number.POSITIVE_INFINITY : Number(searchData.max_sales);
+            const min_date = (!searchData.min_date || searchData.min_date == 'null') ? new Date(-8640000000000000) : new Date(searchData.min_date);
+            const max_date = (!searchData.max_date || searchData.max_date == 'null') ? new Date(8640000000000000) : new Date(searchData.max_date);
     
             const sort = (!searchData.sort) ? "relevance" : searchData.sort;
             
