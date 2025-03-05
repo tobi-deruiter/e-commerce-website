@@ -56,6 +56,30 @@ class API_Client {
             }
         }
     }
+
+    static async getMaxPrice() {
+        const query = new URLSearchParams();
+        query.append('sort', 'highest_price');
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/products/?${query}`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'applicatoin/json',
+                },
+            }).then((res)=>res.json());
+
+            if (!response.success) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return response.products[0].price;
+        } catch (err) {
+            return {
+                success: false,
+                error: err
+            }
+        }
+    }
 }
 
 export default API_Client;

@@ -10,7 +10,8 @@ import Row from 'react-bootstrap/Row';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import API_Client from "../api/api.client";
-import ProductTagsSwitches from "./productTagsSwitches";
+import ProductTagsSwitches from "./Forms/ProductTagsSwitches";
+import DoubleRangeForm from "./Forms/DoubleRangeForm";
 
 const CardHeader = styled(Card.Header)`
     display: flex;
@@ -28,24 +29,18 @@ function FilterToggle( {children, eventKey} ) {
 }
 
 const Searchbar = (props) => {
+    const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [tags, setTags] = useState([]);
     const [currentTags, setCurrentTags] = useState([]);
-    const [loading, setLoading] = useState(false);
-
+    const [maxPrice, setMaxPrice] = useState(1000)
+    const [priceRange, setPriceRange] = useState({min: 0, max: maxPrice});
+    // Handlers
     const handleSearchQuery = (e) => {
         formik.handleChange(e);
         setSearchQuery(e.target.value);
         formik.handleSubmit(e);
     }
-
-    const getTags = async () => {
-        await API_Client.getProductTags().then((data)=>{setCurrentTags(data)});
-    }
-
-    useEffect(()=>{
-        getTags();
-    }, []);
 
     const handleTags = (e) => {
         formik.handleChange(e);
@@ -57,6 +52,24 @@ const Searchbar = (props) => {
             setTags(changedTags.filter(tag => tag != e.target.value));
         }
     }
+
+    const handlePriceRange = (min, max) => {
+        setPriceRange({min: min, max: max});
+    }
+
+    // Getters from database
+    const getTags = async () => {
+        await API_Client.getProductTags().then((data)=>setCurrentTags(data));
+    }
+
+    const getMaxPrice = async () => {
+        await API_Client.getMaxPrice().then((data)=>setMaxPrice(data));
+    }
+
+    useEffect(()=>{
+        getTags();
+        getMaxPrice();
+    }, []);
 
     const formik = useFormik({
         initialValues: {
@@ -90,7 +103,10 @@ const Searchbar = (props) => {
             const searchData = {
                 search: searchQuery,
                 tags: tags,
+                min_price: priceRange.min,
+                max_price: priceRange.max,
             }
+            console.log(searchData);
 
             try {
                 const response = await API_Client.searchProducts(searchData);
@@ -129,7 +145,12 @@ const Searchbar = (props) => {
                                 <ProductTagsSwitches onChange={handleTags} tagsData={currentTags} />
                             </Row>
                             <Row>
-                                
+                                <Col md="1">
+                                    <Form.Label>Price</Form.Label>
+                                </Col>
+                                <Col>
+                                    <DoubleRangeForm min={0} max={maxPrice} steps={0.01} onRangeChange={handlePriceRange} />
+                                </Col>
                             </Row>
                         </Card.Body>
                     </Accordion.Collapse>

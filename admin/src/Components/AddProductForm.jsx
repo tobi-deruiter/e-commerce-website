@@ -7,8 +7,8 @@ import Row from 'react-bootstrap/Row';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import styled from "styled-components";
-import ProductTagsSwitches from "./productTagsSwitches";
-import NewTagForm from "./NewTagForm";
+import ProductTagsSwitches from "./Forms/ProductTagsSwitches";
+import NewTagForm from "./Forms/NewTagForm";
 import API_Client from "../api/api.client";
 
 const FormContainer = styled.div`
