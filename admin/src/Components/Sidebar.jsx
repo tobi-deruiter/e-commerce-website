@@ -17,7 +17,7 @@ const SideNav = styled(Nav)`
     z-index: 100;
     box-shadow: inset -1px 0 0 rgba(0,0,0, 0.1);
 
-    @media (max-width: 992px) {
+    @media (max-width: 1199.8px) {
         display: none;
     }
 `

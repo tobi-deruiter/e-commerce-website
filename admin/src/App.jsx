@@ -18,7 +18,7 @@ const theme = {
 const SideNavWrapper = styled(Col)`
     min-height: calc(100vh - ${theme.navbarHeight}px) !important;
 
-    @media (max-width: 992px) {
+    @media (max-width: 1199.8px) {
         display: none;
     }
 `

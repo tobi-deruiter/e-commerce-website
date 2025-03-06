@@ -3,21 +3,19 @@ import Card from 'react-bootstrap/Card';
 import styled from "styled-components";
 import ThemeButton from "./Pieces/ThemeButton";
 
-const StyledCard = styled(Card)`
+const ProductCard = styled(Card)`
     background-color: ${props => props.theme.white};
     color: ${props => props.theme.black};
 `
 
 const Item = (props) => {
     return (
-        <StyledCard style={{width: props.width}}>
-            <StyledCard.Img variant="top" src={props.image} />
-            <StyledCard.Body>
-                <StyledCard.Title>{props.title}</StyledCard.Title>
-                <StyledCard.Text>{props.description}</StyledCard.Text>
-                <ThemeButton variant="primary">Product details...</ThemeButton>
-            </StyledCard.Body>
-        </StyledCard>
+        <ProductCard style={{width: props.width}}>
+            <ProductCard.Img variant="top" src={props.data.image_url} />
+            <ProductCard.Body>
+                <ProductCard.Title>{props.data.title}</ProductCard.Title>
+            </ProductCard.Body>
+        </ProductCard>
     )
 };
 

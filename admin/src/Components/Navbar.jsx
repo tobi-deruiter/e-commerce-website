@@ -27,7 +27,7 @@ const OffCanvasNavbar = styled(Navbar.Offcanvas)`
 const NAV_BAR = (props) => {
     return (
         <>
-            <StyledNavbar expand="lg" fixed="top">
+            <StyledNavbar expand="xl" fixed="top">
                 <Container>
                     <Link as={Link} to="/" ><NavImage src="https://res.cloudinary.com/dbjagmj0q/image/upload/v1740521536/mzhrisf2mnu8mkvehy2j.png" /></Link>
                     <Navbar.Brand as={Link} to="/" className="me-auto">E-Commerce Website</Navbar.Brand>

@@ -31,15 +31,23 @@ const AllProducts = (props) => {
     const containerRef = useRef(null);
     const width = useContainerWidth(containerRef);
     const [productWidth, setProductWidth] = useState(200);
-    const [productWidthDivider, setProductWidthDivider] = useState(4);
+    const [productSliderData, setProductSliderData] = useState({
+        value: 4,
+        min: Math.round(width/500),
+        max: Math.round(width/200)
+    });
 
     const getProducts = async () => {
         await API_Client.searchProducts().then((data)=>{setProductsData(data)});
     }
 
     const handleProductWidth = (e) => {
-        setProductWidthDivider(e.target.value);
         setProductWidth((width - 10 - (40*e.target.value)) / e.target.value);
+        setProductSliderData({
+            value: e.target.value,
+            min: Math.round(width/450),
+            max: Math.round(width/200)
+        });
     }
 
     useEffect(()=>{
@@ -51,7 +59,13 @@ const AllProducts = (props) => {
     }, [props.productsData]);
 
     useEffect(() => {
-        setProductWidth((width - (50*productWidthDivider)) / productWidthDivider);
+        const newValue = (productSliderData.value > Math.round(width/200)) ? Math.round(width/200) : (productSliderData.value < Math.round(width/450)) ? Math.round(width/450) : productSliderData.value;
+        setProductWidth((width - 10 - (40*newValue)) / newValue);
+        setProductSliderData({
+            value: newValue,
+            min: Math.round(width/450),
+            max: Math.round(width/200)
+        });
     }, [width])
 
     return (
@@ -60,11 +74,11 @@ const AllProducts = (props) => {
                 <Col>
                     <h1>All Products</h1>
                 </Col>
-                <ProductSizeRangeCol>
+                <ProductSizeRangeCol xs="3">
                     <ProdcutSizeRange
-                        value={productWidthDivider}
-                        min={Math.round(width/500)}
-                        max={Math.round(width/200)}
+                        value={productSliderData.value}
+                        min={productSliderData.min}
+                        max={productSliderData.max}
                         onChange={handleProductWidth}
                     />
                 </ProductSizeRangeCol>
@@ -75,7 +89,7 @@ const AllProducts = (props) => {
                     productsData ? 
                         productsData.success ?
                             productsData.products.map((item, i)=>{
-                                return <Item key={i} id={item._id} image={item.image_url} title={item.title} description={item.description} width={productWidth}  />
+                                return <Item key={i} data={item} width={productWidth}  />
                             }) :
                             <p>{productsData.error}</p>
                         :
