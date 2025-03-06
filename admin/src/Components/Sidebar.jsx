@@ -16,6 +16,7 @@ const SideNav = styled(Nav)`
     min-height: calc(100vh - ${props => props.theme.navbarHeight}px) !important;
     z-index: 100;
     box-shadow: inset -1px 0 0 rgba(0,0,0, 0.1);
+    background-color: white;
 
     @media (max-width: 1199.8px) {
         display: none;
