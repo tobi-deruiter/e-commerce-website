@@ -51,7 +51,6 @@ function FilterToggle( {children, eventKey} ) {
 }
 
 const Searchbar = (props) => {
-    const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [tags, setTags] = useState([]);
     const [currentTags, setCurrentTags] = useState([]);
@@ -176,7 +175,6 @@ const Searchbar = (props) => {
                 max_date: dateRange.endDate,
                 sort: sort,
             }
-            console.log(searchData);
 
             try {
                 const response = await API_Client.searchProducts(searchData);
@@ -206,10 +204,9 @@ const Searchbar = (props) => {
                             placeholder="Search"
                             aria-label="Search"
                         />
-                        <Button disabled={loading} type="submit">{!loading ? "Submit" : "Loading..."}</Button>
-                        <FilterToggle eventKey="filter">Filter</FilterToggle>
+                        <FilterToggle eventKey="filter">▼</FilterToggle>
                         <Dropdown onSelect={handleSort}>
-                            <Dropdown.Toggle>Sort By</Dropdown.Toggle>
+                            <Dropdown.Toggle>Sort</Dropdown.Toggle>
                             <Dropdown.Menu>
                                 <SortItem eventKey="relevance">Relevance</SortItem>
                                 <SortItem eventKey="popular">Popular</SortItem>
