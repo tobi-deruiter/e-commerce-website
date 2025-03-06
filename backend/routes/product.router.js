@@ -69,6 +69,13 @@ router.post("/delete", uploadFormData, async (req, res) => {
 
 // check if image changed, upload image, update product (with new? image info), (delete old image ?)
 router.post("/update-one", uploadFile, async (req, res) => {
+    if (!req.file) {
+        return res.status(400).send({
+            success: false,
+            error: "No product image attached",
+        });
+    }
+
     const productData = req.body;
     const productImageData = res.locals;
     const updateResult = await ProductController.updateProduct(productData, productImageData);
