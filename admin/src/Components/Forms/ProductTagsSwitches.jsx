@@ -25,7 +25,17 @@ const ProductTagsSwitches = (props) => {
                         props.tagsData.success ?
                             props.tagsData.tags.map((item, i) => {
                                 if (item != "")
-                                    return <FormControl as={Form.Check} key={i} type="switch" name="tags" aria-label="tag" label={item} value={item} onChange={props.onChange} />
+                                    return <FormControl
+                                        as={Form.Check}
+                                        key={i}
+                                        type="switch"
+                                        name="tags"
+                                        aria-label="tag"
+                                        label={item}
+                                        value={item}
+                                        onChange={props.onChange}
+                                        defaultChecked={!!props.defaultTags?.includes(item)}
+                                    />
                             }) :
                             <p>{props.tagsData.error}</p>
                         :
