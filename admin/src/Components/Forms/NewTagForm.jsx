@@ -20,6 +20,7 @@ const NewTagForm = (props) => {
 
     const handleNewTag = (e) => {
         setNewTag(e.target.value);
+        setNewTagError(false);
     }
 
     const handleRemoveNewTag = (e) => {
@@ -47,7 +48,7 @@ const NewTagForm = (props) => {
             props.handleTags(newTag);
             setNewTag('');
             setNewTagError(false);
-        } else if (newTags.length !== 0) {
+        } else if (newTag.length !== 0) {
             setNewTagError(true);
         }
     }, [effectTrigger]);
