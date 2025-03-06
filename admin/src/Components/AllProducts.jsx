@@ -14,8 +14,9 @@ const AllProductsContainer = styled(Container)`
 `
 
 const AllProductsRow = styled(Row)`
-    gap: 2rem;
+    gap: 0.75rem;
     padding: 1rem;
+    justify-content: center;
 `
 
 const ProductSizeRangeCol = styled(Col)`
@@ -27,14 +28,15 @@ const ProdcutSizeRange = styled(Form.Range)`
 `
 
 const AllProducts = (props) => {
+    const sliderMinDivision = 350, sliderMaxDivision = 200;
     const [productsData, setProductsData] = useState({});
     const containerRef = useRef(null);
     const width = useContainerWidth(containerRef);
     const [productWidth, setProductWidth] = useState(200);
     const [productSliderData, setProductSliderData] = useState({
         value: 4,
-        min: Math.round(width/500),
-        max: Math.round(width/200)
+        min: Math.round(width/sliderMinDivision),
+        max: Math.round(width/sliderMaxDivision)
     });
 
     const getProducts = async () => {
@@ -42,11 +44,11 @@ const AllProducts = (props) => {
     }
 
     const handleProductWidth = (e) => {
-        setProductWidth((width - 10 - (40*e.target.value)) / e.target.value);
+        setProductWidth((width - (30*e.target.value)) / e.target.value);
         setProductSliderData({
             value: e.target.value,
-            min: Math.round(width/450),
-            max: Math.round(width/200)
+            min: Math.round(width/sliderMinDivision),
+            max: Math.round(width/sliderMaxDivision)
         });
     }
 
@@ -59,12 +61,15 @@ const AllProducts = (props) => {
     }, [props.productsData]);
 
     useEffect(() => {
-        const newValue = (productSliderData.value > Math.round(width/200)) ? Math.round(width/200) : (productSliderData.value < Math.round(width/450)) ? Math.round(width/450) : productSliderData.value;
-        setProductWidth((width - 10 - (40*newValue)) / newValue);
+        const min = Math.round(width/sliderMinDivision);
+        const max = Math.round(width/sliderMaxDivision);
+        const oldValue = productSliderData.value > 0 ? productSliderData.value : Math.round((min+max)/2);
+        const newValue = (oldValue > max) ? max : (oldValue < min) ? min : oldValue;
+        setProductWidth((width - (30*newValue)) / newValue);
         setProductSliderData({
             value: newValue,
-            min: Math.round(width/450),
-            max: Math.round(width/200)
+            min: min,
+            max: max
         });
     }, [width])
 
