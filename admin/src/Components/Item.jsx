@@ -4,15 +4,13 @@ import styled from "styled-components";
 import ThemeButton from "./Pieces/ThemeButton";
 
 const StyledCard = styled(Card)`
-    max-width: 18rem;
-    width: 100%;
     background-color: ${props => props.theme.white};
     color: ${props => props.theme.black};
 `
 
 const Item = (props) => {
     return (
-        <StyledCard>
+        <StyledCard style={{width: props.width}}>
             <StyledCard.Img variant="top" src={props.image} />
             <StyledCard.Body>
                 <StyledCard.Title>{props.title}</StyledCard.Title>
