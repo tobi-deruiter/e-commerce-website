@@ -4,6 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import styled from "styled-components";
 import { useIsVisible } from "../../Hooks/useIsVisible";
+import { useContainerWidth } from "../../Hooks/useContainerWidth";
 
 const DoubleRangeContainer = styled.div`
     position: relative;
@@ -41,18 +42,18 @@ const DoubleRangeForm = (props) => {
     const [avg, setAvg] = useState((props.min + props.max) / 2);
     const [minVal, setMinVal] = useState(props.min);
     const [maxVal, setMaxVal] = useState(props.max);
-    const [width, setWidth] = useState(300);
     const containerRef = useRef(null);
     const isVisible = useIsVisible(containerRef);
+    const width = useContainerWidth(containerRef, [isVisible]);
 
-    const minWidth = thumbSize + ((avg - props.min) / (props.max - props.min)) * (width - 2 * thumbSize);
+    const minWidth = thumbSize + ((avg - props.min) / (props.max - props.min)) * ((width - widthOffset) - 2 * thumbSize);
     const styles = {
         min: {
             width: minWidth,
             left: (widthOffset / 2)
         },
         max: {
-            width: thumbSize + ((props.max - avg) / (props.max - props.min)) * (width - 2 * thumbSize),
+            width: thumbSize + ((props.max - avg) / (props.max - props.min)) * ((width - widthOffset) - 2 * thumbSize),
             left: minWidth + (widthOffset / 2)
         }
     };
@@ -77,21 +78,6 @@ const DoubleRangeForm = (props) => {
     useEffect(() => {
         setMaxVal(props.max);
     }, [props.max])
-
-    useEffect(() => {
-        if (containerRef.current) {
-            setWidth(containerRef.current.offsetWidth - 50);
-        }
-
-        const handleResize = () => {
-            setWidth(containerRef.current.offsetWidth - 50);
-        }
-
-        window.addEventListener("resize", handleResize);
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        }
-    }, [containerRef, isVisible]);
 
     return (
         <div>
