@@ -102,6 +102,23 @@ class API_Client {
             }
         }
     }
+
+    static async updateProduct(formData) {
+        try {
+            return await fetch(`${import.meta.env.VITE_API_URL}/products/update-one`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'applicatoin/json',
+                },
+                body: formData,
+            }).then((res)=>res.json());
+        } catch (err) {
+            return {
+                success: false,
+                error: err
+            }
+        }
+    }
 }
 
 export default API_Client;
