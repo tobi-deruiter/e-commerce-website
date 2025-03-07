@@ -21,9 +21,9 @@ const ProductImage = styled(Image)`
 
 const ProductForm = (props) => {
     const [productData, setProductData] = useState({
-        title: '',
-        description: '',
-        price: 0,
+        title: props.data?.title ?? '',
+        description: props.data?.description ?? '',
+        price: props.data?.price ?? 0,
     });
     const [tags, setTags] = useState(props.data?.tags ?? []);
     const [image, setImage] = useState(false);
@@ -117,6 +117,10 @@ const ProductForm = (props) => {
                 } else if (!props.data) {
                     throw new Error("You must choose a product image!");
                 }
+
+                for (const pair of formData.entries()) {
+                    console.log(pair[0], pair[1])
+                }
     
                 const response = 
                     (props.type == "add") ?
@@ -129,6 +133,7 @@ const ProductForm = (props) => {
                 }
     
                 setLoading(false);
+                // window.location.reload();
             } catch (err) {
                 console.error('Error:', err);
                 alert(err);
