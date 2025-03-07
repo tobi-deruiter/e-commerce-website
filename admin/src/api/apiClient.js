@@ -1,4 +1,7 @@
 class API_Client {
+
+    /** GET REQUESTS START */
+
     static async searchProducts(searchData={}) {
         const query = new URLSearchParams();
         for (const key in searchData) {
@@ -39,24 +42,6 @@ class API_Client {
             }
         }
     }
-
-    static async addNewProduct(formData) {
-        try {
-            return await fetch(`${import.meta.env.VITE_API_URL}/products/upload`, {
-                method: 'POST',
-                headers: {
-                    Accept: 'applicatoin/json',
-                },
-                body: formData,
-            }).then((res)=>res.json());
-        } catch (err) {
-            return {
-                success: false,
-                error: err
-            }
-        }
-    }
-
 
     static GET_MAX_PRICE = 'price';
     static GET_MAX_SALES = 'sales';
@@ -103,6 +88,48 @@ class API_Client {
         }
     }
 
+    static async getProductsById(ids) {
+        const query = new URLSearchParams();
+        for (const key in ids) {
+            query.append('product_ids', ids[key])
+        }
+
+        try {
+            return await fetch(`${import.meta.env.VITE_API_URL}/search-by-id/?${query}`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'applicatoin/json',
+                },
+            }).then((res)=>res.json());
+        } catch (err) {
+            return {
+                success: false,
+                error: err
+            }
+        }
+    }
+
+    /** GET REQUESTS END */
+
+    /** POST REQUESTS START */
+
+    static async addNewProduct(formData) {
+        try {
+            return await fetch(`${import.meta.env.VITE_API_URL}/products/upload`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'applicatoin/json',
+                },
+                body: formData,
+            }).then((res)=>res.json());
+        } catch (err) {
+            return {
+                success: false,
+                error: err
+            }
+        }
+    }
+
     static async updateProduct(formData) {
         try {
             return await fetch(`${import.meta.env.VITE_API_URL}/products/update-one`, {
@@ -119,6 +146,8 @@ class API_Client {
             }
         }
     }
+
+    /** POST REQUESTS END */
 }
 
 export default API_Client;
