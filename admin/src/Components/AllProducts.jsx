@@ -6,7 +6,7 @@ import Form from "react-bootstrap/Form";
 import styled from 'styled-components';
 import Item from "./Item";
 
-import API_Client from "../api/api.client";
+import API_Client from "../api/apiClient";
 import { useContainerWidth } from "../Hooks/useContainerWidth";
 
 const AllProductsContainer = styled(Container)`
