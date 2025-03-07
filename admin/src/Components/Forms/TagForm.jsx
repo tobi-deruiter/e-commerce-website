@@ -15,26 +15,31 @@ const FormControl = styled(Form.Control)`
     width: fit-content;
 `
 
-const ProductTagsSwitches = (props) => {
+const TagForm = (props) => {
+    const filter = (item) => {
+        const res = item.startsWith(props.filter ?? "");
+        return props.filterIn ? res : !res;
+    };
+
     return (
         <Form.Group as={Col} >
-            <Form.Label>Tags</Form.Label>
+            <Form.Label>{props.title ?? "Tags"}</Form.Label>
             <TagSwitchesContainer>
                 {
                     props.tagsData ? 
                         props.tagsData.success ?
                             props.tagsData.tags.map((item, i) => {
-                                if (item != "")
+                                if (item != "" && filter(item))
                                     return <FormControl
                                         as={Form.Check}
                                         key={i}
-                                        type="switch"
+                                        type={props.type ?? "switch"}
                                         name="tags"
                                         aria-label="tag"
-                                        label={item}
+                                        label={(props.filterIn && item.startsWith(props.filter)) ? item.substring(props.filter.length) : item}
                                         value={item}
                                         onChange={props.onChange}
-                                        defaultChecked={!!props.defaultTags?.includes(item)}
+                                        defaultChecked={!!props.defaultCheckedTags?.includes(item)}
                                     />
                             }) :
                             <p>{props.tagsData.error}</p>
@@ -46,4 +51,4 @@ const ProductTagsSwitches = (props) => {
     )
 };
 
-export default ProductTagsSwitches;
+export default TagForm;

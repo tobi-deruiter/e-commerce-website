@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import styled from "styled-components";
-import EditProductForm from "./Forms/EditProductForm";
+import ProductForm from "./Forms/ProductForm";
 
 const ProductCard = styled(Card)`
     background-color: ${props => props.theme.white};
@@ -49,6 +49,11 @@ const OffcanvasEditForm = styled(Offcanvas)`
     width: fit-content !important;
 `
 
+const Container = styled.div`
+    padding: 0 5rem 2rem 3rem;
+    max-width: 1000px;
+`
+
 const Item = (props) => {
     const [show, setShow] = useState(false);
 
@@ -73,7 +78,9 @@ const Item = (props) => {
                     <Offcanvas.Title><h2>Product Edit</h2></Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    <EditProductForm data={props.data} />
+                    <Container>
+                        <ProductForm data={props.data} />
+                    </Container>
                 </Offcanvas.Body>
             </OffcanvasEditForm>
         </>

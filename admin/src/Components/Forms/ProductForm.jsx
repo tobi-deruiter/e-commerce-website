@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
@@ -8,15 +8,10 @@ import Row from 'react-bootstrap/Row';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import styled from "styled-components";
-import ProductTagsSwitches from "./ProductTagsSwitches";
+import TagForm from "./TagForm";
 import NewTagForm from "./NewTagForm";
-import API_Client from "../../api/api.client";
+import API_Client from "../../api/apiClient";
 import img_placeholder from '../../assets/images_placeholder.png'
-
-const FormContainer = styled.div`
-    padding: 4rem;
-    max-width: 1000px;
-`
 
 const ProductImage = styled(Image)`
     max-width: 100%;
@@ -24,16 +19,18 @@ const ProductImage = styled(Image)`
     margin: 0 1rem 1rem;
 `
 
-const AddProductForm = (props) => {
+const ProductForm = (props) => {
     const [productData, setProductData] = useState({
         title: '',
         description: '',
         price: 0,
     });
-    const [tags, setTags] = useState([]);
+    const [tags, setTags] = useState(props.data?.tags ?? []);
     const [image, setImage] = useState(false);
     const [loading, setLoading] = useState(false);
     const [currentTags, setCurrentTags] = useState([]);
+    const [portfolioOptions, setPortfolioOptions] = useState([]);
+    const descriptionRef = useRef(null);
 
     const getTags = async () => {
         await API_Client.getProductTags().then((data)=>{setCurrentTags(data)});
@@ -42,6 +39,17 @@ const AddProductForm = (props) => {
     useEffect(()=>{
         getTags();
     }, []);
+
+    useEffect(() => {
+        if (descriptionRef.current) {
+            const height = descriptionRef.current.scrollHeight;
+            descriptionRef.current.style.height = `${height+2}px`;
+        }
+    }, [productData.description]);
+
+    useEffect(()=>{
+        setPortfolioOptions(tags.filter(tag => tag.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX)))
+    }, [tags])
 
     const handleProductData = (e) => {
         formik.handleChange(e);
@@ -52,6 +60,7 @@ const AddProductForm = (props) => {
         formik.handleChange(e);
         let changedTags = tags;
         if (e.target.checked) {
+            if (e.target.value.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX)) changedTags = changedTags.filter(tag => !tag.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX))
             changedTags.push(e.target.value)
             setTags(changedTags);
         } else {
@@ -76,33 +85,44 @@ const AddProductForm = (props) => {
 
     const formik = useFormik({
         initialValues: {
-            title: '',
-            description: '',
-            price: '',
-            tags: [],
-            file: null,
+            title: props.data?.title ?? '',
+            description: props.data?.description ?? '',
+            price: props.data?.price ?? '',
+            file: props.data?.image_url ?? null,
         },
         validationSchema: yup.object().shape({
             title: yup.string().required(),
             description: yup.string().required(),
             price: yup.number().required(),
-            tags: yup.array().required(),
-            file: yup.mixed().required(),
+            file: yup.mixed(),
         }),
         onSubmit: async (e) => {
-            setLoading(true);
-
-            const formData = new FormData();
-            for (const key in productData) {
-                formData.append(key, productData[key]);
-            }
-            for (const key in tags) {
-                formData.append('tags[]', tags[key]);
-            }
-            formData.append('file', image);
-    
             try {
-                const response = await API_Client.addNewProduct(formData);
+                if (!portfolioOptions.some(option => tags.includes(option))) {
+                    throw new Error("You must choose a portfolio!")
+                }
+
+                setLoading(true);
+
+                const formData = new FormData();
+                if (props.data) formData.append('product_id', props.data._id);
+                for (const key in productData) {
+                    formData.append(key, productData[key]);
+                }
+                for (const key in tags) {
+                    formData.append('tags[]', tags[key]);
+                }
+                if (image) {
+                    formData.append('file', image);
+                } else if (!props.data) {
+                    throw new Error("You must choose a product image!");
+                }
+    
+                const response = 
+                    (props.type == "add") ?
+                        await API_Client.addNewProduct(formData)
+                    :
+                        await API_Client.updateProduct(formData);
     
                 if (!response.success) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -117,8 +137,8 @@ const AddProductForm = (props) => {
     });
         
     return (
-        <FormContainer>
-            <h1>Add Product</h1>
+        <div>
+            <h1>{props.data?.title ?? "Add Product"}</h1>
             <hr></hr>
             <Form noValidate onSubmit={formik.handleSubmit}>
                 <Row className="mb-3">
@@ -166,6 +186,7 @@ const AddProductForm = (props) => {
                         <Form.Label>Description</Form.Label>
                         <InputGroup>
                             <Form.Control
+                                ref={descriptionRef}
                                 as="textarea"
                                 type="text"
                                 name="description"
@@ -183,7 +204,23 @@ const AddProductForm = (props) => {
                     </Form.Group>
                 </Row>
                 <Row className="mb-3">
-                    <ProductTagsSwitches onChange={handleTags} tagsData={currentTags} />
+                    <TagForm
+                        title="Category / Portfolio"
+                        type="radio"
+                        onChange={handleTags}
+                        tagsData={currentTags}
+                        defaultCheckedTags={props.data?.tags}
+                        filter={import.meta.env.VITE_PORTFOLIO_TAG_PREFIX}
+                        filterIn
+                    />
+                </Row>
+                <Row className="mb-3">
+                    <TagForm
+                        onChange={handleTags}
+                        tagsData={currentTags}
+                        defaultCheckedTags={props.data?.tags}
+                        filter={import.meta.env.VITE_PORTFOLIO_TAG_PREFIX}
+                    />
                 </Row>
                 <Row className="mb-3">
                     <NewTagForm handleTags={handleNewTag} tagsData={currentTags} />
@@ -199,18 +236,21 @@ const AddProductForm = (props) => {
                             aria-label="File"
                             onChange={handleImage}
                             isValid={formik.touched.file && image}
-                            isInvalid={formik.touched.file && !image}
+                            isInvalid={formik.touched.file && !image && !props.data}
                         />
                         <Form.Control.Feedback type="invalid" tooltip>
                             {formik.errors.file}
                         </Form.Control.Feedback>
                     </Form.Group>
-                    <ProductImage src={image ? URL.createObjectURL(image) : img_placeholder} thumbnail />
+                    <ProductImage 
+                        src={image ? URL.createObjectURL(image) : props.data ? props.data.image_url : img_placeholder}
+                        thumbnail
+                    />
                 </Row>
                 <Button disabled={loading} type="submit">{!loading ? "Submit" : "Submitting..."}</Button>
             </Form>
-        </FormContainer>
+        </div>
     )
 };
 
-export default AddProductForm;
+export default ProductForm;

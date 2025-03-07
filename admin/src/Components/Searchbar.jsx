@@ -11,8 +11,8 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import API_Client from "../api/api.client";
-import ProductTagsSwitches from "./Forms/ProductTagsSwitches";
+import API_Client from "../api/apiClient";
+import ProductTagsSwitches from "./Forms/TagForm";
 import DoubleRangeForm from "./Forms/DoubleRangeForm";
 import DateRangeForm from "./Forms/DateRangeForm";
 
