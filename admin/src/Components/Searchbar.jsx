@@ -12,7 +12,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import API_Client from "../api/apiClient";
-import ProductTagsSwitches from "./Forms/TagForm";
+import TagForm from "./Forms/TagForm";
 import DoubleRangeForm from "./Forms/DoubleRangeForm";
 import DateRangeForm from "./Forms/DateRangeForm";
 
@@ -105,7 +105,6 @@ const Searchbar = (props) => {
         const children = e.target.parentElement.children;
         for (const item in children) {
             if (children[item].style) {
-                console.log(children[item].style.backgroundColor)
                 children[item].style.backgroundColor = "white";
             }
         }
@@ -233,7 +232,11 @@ const Searchbar = (props) => {
                     <Accordion.Collapse eventKey="filter">
                         <Card.Body>
                             <FilterRow>
-                                <ProductTagsSwitches onChange={handleTags} tagsData={currentTags} />
+                            <TagForm
+                                onChange={handleTags}
+                                tagsData={currentTags}
+                                filter={import.meta.env.VITE_PORTFOLIO_TAG_PREFIX}
+                            />
                             </FilterRow>
                             <FilterRow>
                                 <FilterLabelCol md="1">
