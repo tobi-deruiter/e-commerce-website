@@ -75,8 +75,8 @@ const Searchbar = (props) => {
         formik.handleChange(e);
         let changedTags = tags;
         if (e.target.checked) {
-            changedTags.push(e.target.value)
-            setTags(changedTags);
+            changedTags.push(e.target.value);
+            setTags(changedTags.filter(tag => tag == tag));
         } else {
             setTags(changedTags.filter(tag => tag != e.target.value));
         }
@@ -192,6 +192,7 @@ const Searchbar = (props) => {
                 if (!response.success) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                console.log(response)
 
                 props.handleProductSearch(response);
             } catch (err) {
@@ -232,11 +233,20 @@ const Searchbar = (props) => {
                     <Accordion.Collapse eventKey="filter">
                         <Card.Body>
                             <FilterRow>
-                            <TagForm
-                                onChange={handleTags}
-                                tagsData={currentTags}
-                                filter={import.meta.env.VITE_PORTFOLIO_TAG_PREFIX}
-                            />
+                                <TagForm
+                                    title="Category / Portfolio"
+                                    onChange={handleTags}
+                                    tagsData={currentTags}
+                                    filter={import.meta.env.VITE_PORTFOLIO_TAG_PREFIX}
+                                    filterIn
+                                />
+                            </FilterRow>
+                            <FilterRow>
+                                <TagForm
+                                    onChange={handleTags}
+                                    tagsData={currentTags}
+                                    filter={import.meta.env.VITE_PORTFOLIO_TAG_PREFIX}
+                                />
                             </FilterRow>
                             <FilterRow>
                                 <FilterLabelCol md="1">
