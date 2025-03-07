@@ -23,6 +23,8 @@ const CardHeader = styled(Card.Header)`
 
 const SortItem = styled(Dropdown.Item)`
     text-align: right;
+    border-radius: 1rem;
+    background-color: white;
 `
 
 const FilterLabelCol = styled(Col)`
@@ -67,7 +69,6 @@ const Searchbar = (props) => {
     const handleSearchQuery = (e) => {
         formik.handleChange(e);
         setSearchQuery(e.target.value);
-        formik.handleSubmit(e);
     }
 
     const handleTags = (e) => {
@@ -100,8 +101,15 @@ const Searchbar = (props) => {
                 setDateRange({ startDate: null, endDate: null });
     }
 
-    const handleSort = (eventKey, event) => {
-        console.log(eventKey)
+    const handleSort = (eventKey, e) => {
+        const children = e.target.parentElement.children;
+        for (const item in children) {
+            if (children[item].style) {
+                console.log(children[item].style.backgroundColor)
+                children[item].style.backgroundColor = "white";
+            }
+        }
+        e.target.style.backgroundColor = "lightgray";
         setSort(eventKey);
     }
 
@@ -133,6 +141,10 @@ const Searchbar = (props) => {
         getMax(API_Client.GET_MAX_QUANTITY);
     }, []);
 
+    useEffect(() => {
+        formik.handleSubmit();
+    }, [searchQuery, tags, priceRange, salesRange, quantityRange, dateRange, sort])
+
     const formik = useFormik({
         initialValues: {
             search: '',
@@ -161,7 +173,6 @@ const Searchbar = (props) => {
             max_date: yup.date(),
         }),
         onSubmit: async (e) => {
-            setLoading(true);
             const searchData = {
                 search: searchQuery,
                 tags: tags,
@@ -184,7 +195,6 @@ const Searchbar = (props) => {
                 }
 
                 props.handleProductSearch(response);
-                setLoading(false);
             } catch (err) {
                 console.error('Error:', err);
             }
@@ -208,7 +218,7 @@ const Searchbar = (props) => {
                         <Dropdown onSelect={handleSort}>
                             <Dropdown.Toggle>Sort</Dropdown.Toggle>
                             <Dropdown.Menu>
-                                <SortItem eventKey="relevance">Relevance</SortItem>
+                                <SortItem eventKey="relevance" style={{backgroundColor: "lightgray"}}>Relevance</SortItem>
                                 <SortItem eventKey="popular">Popular</SortItem>
                                 <SortItem eventKey="alphabetically">Alphabetically</SortItem>
                                 <SortItem eventKey="lowest_price">Lowest Price</SortItem>
