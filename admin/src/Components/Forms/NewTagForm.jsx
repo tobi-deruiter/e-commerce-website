@@ -25,8 +25,9 @@ const NewTagForm = (props) => {
 
     const handleRemoveNewTag = (e) => {
         let changedTags = newTags;
-        setNewTags(changedTags.filter(tag => tag != e.target.value));
-        props.handleTags(e.target.value);
+        const _tag = props.isPortfolioForm ? `${import.meta.env.VITE_PORTFOLIO_TAG_PREFIX}${e.target.value}` : e.target.value;
+        setNewTags(changedTags.filter(tag => tag != _tag));
+        props.handleTags(_tag);
     }
 
     const handleTabKeyDown = (e) => {
@@ -41,11 +42,22 @@ const NewTagForm = (props) => {
     }
 
     useEffect(() => {
-        if (newTag !== "" && newTags.indexOf(newTag) === -1 && props.tagsData.tags.indexOf(newTag) === -1) {
+        if (props.defaultTags) {
+            const tags = props.isPortfolioForm ?
+                    props.defaultTags.filter(tag => tag.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX))
+                :
+                    props.defaultTags.filter(tag => !tag.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX))
+            setNewTags(tags);
+        }
+    }, [props.defaultTags]);
+
+    useEffect(() => {
+        const _tag = props.isPortfolioForm ? `${import.meta.env.VITE_PORTFOLIO_TAG_PREFIX}${newTag}` : newTag;
+        if (_tag !== "" && newTags.indexOf(_tag) === -1 && props.tagsData.tags?.indexOf(_tag) === -1) {
             let changedTags = newTags;
-            changedTags.push(newTag);
+            changedTags.push(_tag);
             setNewTags(changedTags);
-            props.handleTags(newTag);
+            props.handleTags(_tag);
             setNewTag('');
             setNewTagError(false);
         } else if (newTag.length !== 0) {
@@ -53,24 +65,31 @@ const NewTagForm = (props) => {
         }
     }, [effectTrigger]);
 
+    const mapNewTags = (item, i) => {
+        return <NewTag
+            key={i}
+            label={item}
+            value={props.isPortfolioForm ? item.substring(11) : item}
+            onRemoveNewTag={handleRemoveNewTag}
+        />
+    }
+
     return (
         <>
             <NewTagsContainer>
                 {
-                    newTags ?
-                        newTags.map((item, i) => {
-                            return <NewTag key={i} value={item} onRemoveNewTag={handleRemoveNewTag} />
-                        })
-                        : <></>
+                    newTags && newTags.length > 0 ?
+                        newTags.map((item, i) => mapNewTags(item, i))
+                        : <p className="text-muted">There are no new {props.isPortfolioForm ? "categories/portfolios" : "tags"} currently set.</p>
                 }
             </NewTagsContainer>
             <Form.Group as={Col} md="4" className="mt-3" >
-                <Form.Label>Add New Tag</Form.Label>
+                <Form.Label>{props.isPortfolioForm ? "Add New Category/Portfolio" : "Add New Tag"}</Form.Label>
                 <InputGroup>
                     <Form.Control
                         type="text"
                         name="new_tag"
-                        placeholder="New Tag"
+                        placeholder={props.isPortfolioForm ? "New Category/Portfolio" : "New Tag"}
                         aria-label="New Tag"
                         value={newTag}
                         onChange={handleNewTag}
@@ -79,7 +98,7 @@ const NewTagForm = (props) => {
                     />
                     <InputGroup.Text as={Button} onClick={triggerEffect}>Add</InputGroup.Text>
                     <Form.Control.Feedback type="invalid" tooltip>
-                        this new tag is either empty or already exists
+                        this new {props.isPortfolioForm ? "category/portfolio" : "tag"} is either empty or already exists
                     </Form.Control.Feedback>
                 </InputGroup>
             </Form.Group>
