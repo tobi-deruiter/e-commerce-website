@@ -95,7 +95,7 @@ class API_Client {
         }
 
         try {
-            return await fetch(`${import.meta.env.VITE_API_URL}/search-by-id/?${query}`, {
+            return await fetch(`${import.meta.env.VITE_API_URL}/products/search-by-id/?${query}`, {
                 method: 'GET',
                 headers: {
                     Accept: 'applicatoin/json',
@@ -131,6 +131,34 @@ class API_Client {
     }
 
     static async updateProduct(formData) {
+        try {
+            return await fetch(`${import.meta.env.VITE_API_URL}/products/update-one`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'applicatoin/json',
+                },
+                body: formData,
+            }).then((res)=>res.json());
+        } catch (err) {
+            return {
+                success: false,
+                error: err
+            }
+        }
+    }
+
+    static async updateDefaultSettingsProduct(data) {
+        const formData = new FormData();
+        formData.append('product_id', import.meta.env.VITE_PRODUCT_DEFAULT_SETTINGS_ID);
+        for (const item in data) {
+            if (item == "tags") {
+                for (const i in data[item])
+                    formData.append("tags[]", data[item][i])
+            }
+        }
+        for (const pair of formData.entries()) {
+            console.log(pair);
+        }
         try {
             return await fetch(`${import.meta.env.VITE_API_URL}/products/update-one`, {
                 method: 'POST',
