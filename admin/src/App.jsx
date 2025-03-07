@@ -5,13 +5,14 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import styled from 'styled-components';
-import Sidebar from "./Components/Sidebar";
+import Sidebar from "./Components/Nav/Sidebar";
 import Home from "./Pages/Home";
 import AddProduct from "./Pages/AddProduct";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NAV_BAR from "./Components/Navbar";
+import NAV_BAR from "./Components/Nav/Navbar";
+import Settings from "./Pages/Settings";
 
-const Settings = createContext(null);
+const SettingsContext = createContext(null);
 
 const SideNavWrapper = styled(Col)`
     min-height: calc(100vh - ${props => props.theme.navbarHeight}px) !important;
@@ -36,7 +37,7 @@ const App = (props) => {
     };
 
     return (
-        <Settings.Provider value={settings}>
+        <SettingsContext.Provider value={settings}>
             <ThemeProvider theme={theme}>
                 <Container fluid>
                     <BrowserRouter>
@@ -51,13 +52,14 @@ const App = (props) => {
                                 <Routes>
                                     <Route path='/' element={<Home />}/>
                                     <Route path='/addproduct' element={<AddProduct/>}/>
+                                    <Route path="/settings" element={<Settings/>}/>
                                 </Routes>
                             </ContentWrapper>
                         </Row>
                     </BrowserRouter>
                 </Container>
             </ThemeProvider>
-        </Settings.Provider>
+        </SettingsContext.Provider>
     )
 };
 
