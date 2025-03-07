@@ -2,14 +2,14 @@ import React from "react"
 import styled from'styled-components';
 import Nav from 'react-bootstrap/Nav';
 import { Link } from 'react-router-dom';
+import NavLinks from "./NavLinks";
 
 const SideNav = styled(Nav)`
-    display: block;
     position: fixed;
     top: ${props => props.theme.navbarHeight}px;
     bottom: 0;
     left: 0;
-    padding: 1rem;
+    padding: 2rem;
     margin-left: -1rem;
     width: 207px;
     min-width: 207px;
@@ -23,28 +23,10 @@ const SideNav = styled(Nav)`
     }
 `
 
-const NavbarLink = styled(SideNav.Link)`
-    display: block;
-    border: 1px solid rgba(0,0,0, 0.5);
-    border-radius: 1rem;
-    margin: 1rem;
-    color: black !important;
-    text-decoration: none !important;
-    padding: 0.5rem;
-
-    &:hover {
-        background-color: rgba(0,0,0, 0.15)
-    }
-`
-
-
 const Sidebar = (props) => {
     return (
         <SideNav className="col-md-12">
-            <NavbarLink as={Link} to="/">All Products</NavbarLink>
-            <NavbarLink as={Link} to="/addproduct">Add New Product</NavbarLink>
-            <NavbarLink as={Link} to="/portfolio-first">First Portfolio</NavbarLink>
-            <NavbarLink as={Link} to="/portfolio-second">Second Portfolio</NavbarLink>
+            <NavLinks />
         </SideNav>
     )
 };

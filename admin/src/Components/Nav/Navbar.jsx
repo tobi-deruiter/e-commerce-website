@@ -7,6 +7,7 @@ import Image from 'react-bootstrap/Image';
 import styled from'styled-components';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { Link } from 'react-router-dom';
+import NavLinks from "./NavLinks";
 
 const StyledNavbar = styled(Navbar)`
     height: ${props => props.theme.navbarHeight}px;
@@ -19,7 +20,7 @@ const NavImage = styled(Image)`
 `
 
 const OffCanvasNavbar = styled(Navbar.Offcanvas)`
-    @media (min-width: 992px) {
+    @media (min-width: 1199.8px) {
         display: none;
     }
 `
@@ -44,12 +45,7 @@ const NAV_BAR = (props) => {
                         </Offcanvas.Header>
                         <Offcanvas.Body className="d-block">
                             <Nav>
-                                <Nav.Link as={Link} to="/">Home</Nav.Link>
-                                <NavDropdown title="Portfolios" id="basic-nav-dropdown">
-                                    <NavDropdown.Item as={Link} to="portfolio-first">First Portfolio</NavDropdown.Item>
-                                    <NavDropdown.Item as={Link} to="portfolio-second">Second Portfolio</NavDropdown.Item>
-                                </NavDropdown>
-                                <Nav.Link as={Link} to="/about">About</Nav.Link>
+                                <NavLinks />
                             </Nav>
                         </Offcanvas.Body>
                     </OffCanvasNavbar>
