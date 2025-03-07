@@ -22,13 +22,17 @@ const NavbarLink = styled(Nav.Link)`
 `
 
 const NavLinks = (props) => {
+    const handleClick = () => {
+        if (props.handleClose) props.handleClose();
+    }
+
     return (
         <Container>
-            <NavbarLink as={Link} to="/">All Products</NavbarLink>
-            <NavbarLink as={Link} to="/addproduct">Add New Product</NavbarLink>
-            <NavbarLink as={Link} to="/portfolio-first">First Portfolio</NavbarLink>
-            <NavbarLink as={Link} to="/portfolio-second">Second Portfolio</NavbarLink>
-            <NavbarLink as={Link} to="/settings">Settings</NavbarLink>
+            <NavbarLink onClick={handleClick} as={Link} to="/">All Products</NavbarLink>
+            <NavbarLink onClick={handleClick} as={Link} to="/addproduct">Add New Product</NavbarLink>
+            <NavbarLink onClick={handleClick} as={Link} to="/portfolio-first">First Portfolio</NavbarLink>
+            <NavbarLink onClick={handleClick} as={Link} to="/portfolio-second">Second Portfolio</NavbarLink>
+            <NavbarLink onClick={handleClick} as={Link} to="/settings">Settings</NavbarLink>
         </Container>
     )
 };

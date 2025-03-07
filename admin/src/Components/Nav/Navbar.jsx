@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
@@ -26,16 +26,20 @@ const OffCanvasNavbar = styled(Navbar.Offcanvas)`
 `
 
 const NAV_BAR = (props) => {
+    const [expanded, setExpanded] = useState(false);
+
+    const handleClose = () => setExpanded(false);
+    const handleOpen = () => setExpanded(true);
+
     return (
         <>
-            <StyledNavbar expand="xl" fixed="top">
+            <StyledNavbar expand="xl" fixed="top" expanded={expanded}>
                 <Container>
                     <Link as={Link} to="/" ><NavImage src="https://res.cloudinary.com/dbjagmj0q/image/upload/v1740521536/mzhrisf2mnu8mkvehy2j.png" /></Link>
                     <Navbar.Brand as={Link} to="/" className="me-auto">E-Commerce Website</Navbar.Brand>
-                    <Navbar.Toggle aria-controls={`offcanvasNavbar`} />
+                    <Navbar.Toggle aria-controls={`offcanvasNavbar`} onClick={handleOpen} />
                     <OffCanvasNavbar
                         id={`offcanvasNavbar`}
-                        aria-labelledby={`offcanvasNavbarLabel`}
                         placement="start"
                     >
                         <Offcanvas.Header closeButton>
@@ -45,7 +49,7 @@ const NAV_BAR = (props) => {
                         </Offcanvas.Header>
                         <Offcanvas.Body className="d-block">
                             <Nav>
-                                <NavLinks />
+                                <NavLinks handleClose={handleClose} />
                             </Nav>
                         </Offcanvas.Body>
                     </OffCanvasNavbar>
