@@ -1,4 +1,5 @@
 const Product = require("../models/product.model");
+require("dotenv").config();
 
 class ProductController {
 
@@ -33,6 +34,7 @@ class ProductController {
             const products = await Product.aggregate([
                 { $match: {
                     $and: [
+                        { _id: { $ne: process.env.PRODUCT_DEFAULT_SETTINGS_ID } },
                         {
                             $or: [
                                 { title: search },
