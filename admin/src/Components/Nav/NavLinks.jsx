@@ -30,8 +30,6 @@ const NavLinks = (props) => {
         <Container>
             <NavbarLink onClick={handleClick} as={Link} to="/">All Products</NavbarLink>
             <NavbarLink onClick={handleClick} as={Link} to="/addproduct">Add New Product</NavbarLink>
-            <NavbarLink onClick={handleClick} as={Link} to="/portfolio-first">First Portfolio</NavbarLink>
-            <NavbarLink onClick={handleClick} as={Link} to="/portfolio-second">Second Portfolio</NavbarLink>
             <NavbarLink onClick={handleClick} as={Link} to="/settings">Settings</NavbarLink>
         </Container>
     )
