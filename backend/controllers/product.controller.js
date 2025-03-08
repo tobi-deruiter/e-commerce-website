@@ -191,7 +191,6 @@ class ProductController {
     }
 
     static async deleteProducts(productData) {
-        console.log(productData)
         try {    
             if (!productData.product_ids || productData.product_ids.length == 0) {
                 throw new Error("No ids given.")
@@ -199,8 +198,7 @@ class ProductController {
             const products = await Product.find({
                 _id: { $in: productData.product_ids }
             });
-            console.log(products)
-            
+                        
             await Product.deleteMany({
                 _id: { $in: productData.product_ids }
             });
