@@ -192,7 +192,6 @@ const Searchbar = (props) => {
                 if (!response.success) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                console.log(response)
 
                 props.handleProductSearch(response);
             } catch (err) {
