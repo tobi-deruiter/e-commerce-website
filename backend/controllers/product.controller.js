@@ -199,7 +199,7 @@ class ProductController {
                 _id: { $in: productData.product_ids }
             });
             
-            Product.deleteMany({
+            await Product.deleteMany({
                 _id: { $in: productData.product_ids }
             });
         
