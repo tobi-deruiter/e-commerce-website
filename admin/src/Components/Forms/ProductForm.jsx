@@ -132,6 +132,13 @@ const ProductForm = (props) => {
         setImage(e.target.files[0]);
     }
 
+    const handleDeleteProduct = async () => {
+        if (props.data && confirm(`Are you sure you would like to delete "${props.data.title}"?`)) {
+            await API_Client.deleteProducts([props.data._id]);
+            window.location.reload();
+        }
+    }
+
     /** GETTERS */
 
     const getTags = async () => {
@@ -267,7 +274,18 @@ const ProductForm = (props) => {
                             thumbnail
                         />
                     </Row>
-                    <Button disabled={loading} type="submit">{!loading ? "Submit" : "Submitting..."}</Button>
+                    <Row>
+                        <Col>
+                            <Button disabled={loading} type="submit">{!loading ? "Submit" : "Submitting..."}</Button>
+                        </Col>
+                        {
+                            props.type != "add" ?
+                                    <Col className="d-flex">
+                                        <Button className="ms-auto" disabled={loading} variant="danger" onClick={handleDeleteProduct}>Delete</Button>
+                                    </Col>
+                                : <></>
+                        }
+                    </Row>
                 </Form>
             </div>
             <ResultToast
