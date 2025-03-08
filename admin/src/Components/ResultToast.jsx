@@ -9,6 +9,7 @@ const ContainerForToast = styled.div`
     right: 0;
     max-width: 90%;
     padding: 4.5rem 0.5rem;
+    z-index: 1000;
 `
 
 const ResultToast = (props) => {

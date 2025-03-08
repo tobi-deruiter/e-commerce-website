@@ -44,9 +44,9 @@ const SettingsForm = (props) => {
 
             console.log(response);
         } catch (err) {
-            console.log("Response:", response);
+            console.log("Response:", formResult);
             console.log("Error:", err);
-            alert(err);
+            alert(formResult.error);
         }
         setShowResToast(true);
         setLoading(false);
