@@ -42,12 +42,12 @@ class ProductController {
                                 { description: search },
                             ]
                         },
-                        { tags: { $in: tags } },
+                        { tags: { $in: tags } }, // TODO: use $all instead of $in, give option for must match all tags
                         { price: { $gte: min_price, $lte: max_price } },
                         { available: { $eq: available } },
                         { quantity: { $gte: min_quantity, $lte: max_quantity } },
                         { sales: { $gte: min_sales, $lte: max_sales } },
-                        { date: { $gte: min_date, $lte: max_date } },
+                        { createdAt: { $gte: min_date, $lte: max_date } },
                     ]
                     // $or: [
                     //     { title: search },
