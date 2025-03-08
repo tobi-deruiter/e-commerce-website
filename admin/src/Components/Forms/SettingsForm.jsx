@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import DefaultTagsForm from "./DefaultTagsForm";
 import styled from "styled-components";
 import API_Client from "../../api/apiClient";
+import ResultToast from "../ResultToast";
 
 const FormContainer = styled.div`
     padding: 4rem;
@@ -14,8 +15,14 @@ const FormContainer = styled.div`
 `
 
 const SettingsForm = (props) => {
+    const formSuccessMessage = "You have successfully saved the site settings.";
+    
     const [loading, setLoading] = useState(false);
     const [defaultTags, setDefaultTags] = useState([]);
+    const [showResToast, setShowResToast] = useState(false);
+    const [formResult, setFormResult] = useState({ success: false});
+
+    const handleToastClose = () => setShowResToast(false);
 
     const handleDefaultTags = (newTag) => {
         let changedTags = defaultTags;
@@ -33,26 +40,38 @@ const SettingsForm = (props) => {
         let response;
         try {
             response = await API_Client.updateDefaultSettingsProduct({ tags: defaultTags });
+            setFormResult(response);
+
             console.log(response);
         } catch (err) {
             console.log("Response:", response);
             console.log("Error:", err);
             alert(err);
         }
+        setShowResToast(true);
         setLoading(false);
     }
 
     return (
-        <FormContainer>
-            <h1>Settings</h1>
-            <hr></hr>
-            <br />
-            <Form noValidate onSubmit={handleSubmit}>
-                <DefaultTagsForm handleDefaultTags={handleDefaultTags} />
+        <>
+            <FormContainer>
+                <h1>Settings</h1>
+                <hr></hr>
                 <br />
-                <Button disabled={loading} type="submit">{loading ? "Saving..." : "Save"}</Button>
-            </Form>
-        </FormContainer>
+                <Form noValidate onSubmit={handleSubmit}>
+                    <DefaultTagsForm handleDefaultTags={handleDefaultTags} />
+                    <br />
+                    <Button disabled={loading} type="submit">{loading ? "Saving..." : "Save"}</Button>
+                </Form>
+            </FormContainer>
+            <ResultToast
+                show={showResToast}
+                onClose={handleToastClose}
+                success={formResult.success}
+                title="Settings"
+                message={formResult.success ? formSuccessMessage : formResult.error}
+            />
+        </>
     )
 };
 
