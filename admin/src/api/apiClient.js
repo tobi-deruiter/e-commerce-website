@@ -156,9 +156,7 @@ class API_Client {
                     formData.append("tags[]", data[item][i])
             }
         }
-        for (const pair of formData.entries()) {
-            console.log(pair);
-        }
+
         try {
             return await fetch(`${import.meta.env.VITE_API_URL}/products/update-one`, {
                 method: 'POST',
