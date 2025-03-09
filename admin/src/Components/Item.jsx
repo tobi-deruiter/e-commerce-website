@@ -1,7 +1,8 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
+import Form from 'react-bootstrap/Form';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import styled from "styled-components";
 import ProductForm from "./Forms/ProductForm";
@@ -56,14 +57,42 @@ const Container = styled.div`
 
 const Item = (props) => {
     const [show, setShow] = useState(false);
+    const [checked, setChecked] = useState(false);
 
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const handleClick = (e) => {
+        props.setPreviousSelectAll(props.selectAll);
+        if (!props.allowSelect)
+            setShow(true);
+        else {
+            setChecked(!checked);
+        }
+    };
+
+    useEffect(() => {
+        !(!props.selectAll && props.previousSelectAll) && props.onSelect(checked, props.data);
+    }, [checked])
+
+    useEffect(() => {
+        setChecked(props.selectAll);
+    }, [props.selectAll])
 
     return (
         <>
-            <ProductCard style={{width: props.width}} onClick={handleShow}>
-                <Card.Header>{props.data.title}</Card.Header>
+            <ProductCard style={{width: props.width}} onClick={handleClick}>
+                <Card.Header className="d-flex">
+                    {props.data.title}
+                    {
+                        props.allowSelect ? 
+                                <Form.Check
+                                    className="ms-auto"
+                                    value={props.data}
+                                    checked={checked}
+                                    readOnly
+                                />
+                            : <></>
+                    }
+                </Card.Header>
                 <ProductBody>
                     <ImgContainer>
                         <Img variant="top" src={props.data.image_url} />
