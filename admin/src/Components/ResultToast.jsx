@@ -13,11 +13,13 @@ const ContainerForToast = styled.div`
 `
 
 const ResultToast = (props) => {
+    const delay = 3;
+
     const [show, setShow] = useState(false);
 
     const handleClose = () => {
-        setShow(false);
         props.onClose();
+        props.success && window.location.reload();
     }
 
     useEffect(() => {
@@ -30,14 +32,14 @@ const ResultToast = (props) => {
                 onClose={handleClose}
                 bg={props.success ? "success" : "danger"}
                 show={show}
-                delay={2000}
+                delay={delay*1000}
                 autohide
             >
                 <Toast.Header>
                     <strong className="me-auto">{props.success ? "Success" : "Error"}!</strong>
                     <small>{props.title}</small>
                 </Toast.Header>
-                <Toast.Body>{props.message}</Toast.Body>
+                <Toast.Body>{props.message} <br /> {props.success && `The page will automatically reload in ${delay}s`}</Toast.Body>
             </Toast>
         </ContainerForToast>
     )
