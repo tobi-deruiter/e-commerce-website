@@ -91,7 +91,6 @@ router.post("/update-one", uploadFile, async (req, res) => {
 });
 
 router.post("/update-many", uploadFormData, async (req, res) => {
-    console.log(req.body);
     const productData = req.body;
     const updateResult = await ProductController.updateManyProducts(productData);
     const status = (!updateResult.success) ? 500 : 200;
