@@ -21,10 +21,10 @@ const ProductImage = styled(Image)`
 `
 
 const ProductForm = (props) => {
-    const formSuccessMessage = "You have successfully saved this product."
 
     /** HOOKS */
 
+    const descriptionRef = useRef(null);
     const [productData, setProductData] = useState({
         title: props.data?.title ?? '',
         description: props.data?.description ?? '',
@@ -37,7 +37,7 @@ const ProductForm = (props) => {
     const [portfolioOptions, setPortfolioOptions] = useState([]);
     const [showResToast, setShowResToast] = useState(false);
     const [formResult, setFormResult] = useState({ success: false});
-    const descriptionRef = useRef(null);
+    const [formSuccessMessage, setFormSuccessMessage] = useState("You have successfully saved this product.");
 
     const formik = useFormik({
         initialValues: {
@@ -47,25 +47,30 @@ const ProductForm = (props) => {
             file: props.data?.image_url ?? null,
         },
         validationSchema: yup.object().shape({
-            title: yup.string().required(),
-            description: yup.string().required(),
-            price: yup.number().required(),
+            title: yup.string(),
+            description: yup.string(),
+            price: yup.number(),
             file: yup.mixed(),
         }),
         onSubmit: async (e) => {
+            console.log("submit")
+            let response;
             setLoading(true);
             try {
-                if (!portfolioOptions.some(option => tags.includes(option))) {
+                if (props.type != "massEdit" && !portfolioOptions.some(option => tags.includes(option))) {
                     throw new Error("You must choose a portfolio!")
                 }
 
                 const formData = new FormData();
-                if (props.data) formData.append('product_id', props.data._id);
-                for (const key in productData) {
-                    formData.append(key, productData[key]);
+                if (props.type == "massEdit")
+                    for (const i in props.selectedProducts)
+                        formData.append('product_ids[]', props.selectedProducts[i])
+                (props.data && props.type != "massEdit") && formData.append('product_id', props.data._id);
+                for (const i in productData) {
+                    formData.append(i, productData[i]);
                 }
-                for (const key in tags) {
-                    formData.append('tags[]', tags[key]);
+                for (const i in tags) {
+                    formData.append('tags[]', tags[i]);
                 }
                 if (image) {
                     formData.append('file', image);
@@ -77,12 +82,16 @@ const ProductForm = (props) => {
                     console.log(pair[0], pair[1])
                 }
     
-                const response = 
-                    (props.type == "add") ?
-                        await API_Client.addNewProduct(formData)
-                    :
-                        await API_Client.updateProduct(formData);
-                setFormResult(response);
+                switch (props.type) {
+                    case "add":
+                        response = await API_Client.addNewProduct(formData);
+                        break;
+                    case "massEdit":
+                        response = await API_Client.updateManyProducts(formData);
+                        break;
+                    default:
+                        response = await API_Client.updateProduct(formData);
+                }
     
                 if (!response.success) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -91,12 +100,18 @@ const ProductForm = (props) => {
                 console.error('Error:', err);
                 alert(err);
             }
-            setShowResToast(true);
+            (response.success != undefined) && handleToastOpen(response, formSuccessMessage);
             setLoading(false);
         }
     });
 
     /** HANDLERS */
+
+    const handleToastOpen = (res, message) => {
+        setFormSuccessMessage(message);
+        setFormResult(res);
+        setShowResToast(true);
+    }
 
     const handleToastClose = () => setShowResToast(false);
 
@@ -109,7 +124,8 @@ const ProductForm = (props) => {
         formik.handleChange(e);
         let changedTags = tags;
         if (e.target.checked) {
-            if (e.target.value.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX)) changedTags = changedTags.filter(tag => !tag.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX))
+            if (e.target.value.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX))
+                changedTags = changedTags.filter(tag => !tag.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX))
             changedTags.push(e.target.value)
             setTags(changedTags);
         } else {
@@ -133,10 +149,12 @@ const ProductForm = (props) => {
     }
 
     const handleDeleteProduct = async () => {
-        if (props.data && confirm(`Are you sure you would like to delete "${props.data.title}"?`)) {
-            await API_Client.deleteProducts([props.data._id]);
-            window.location.reload();
+        setLoading(true);
+        if (props.data && confirm(`Are you sure you would like to delete "${props.data.title}"?\n\nTHIS IS A PERMANENT ACTION`)) {
+            const res = await API_Client.deleteProducts([props.data._id]);
+            handleToastOpen(res, `Successfully deleted "${props.data.title}"`)
         }
+        setLoading(false);
     }
 
     /** GETTERS */
@@ -180,7 +198,7 @@ const ProductForm = (props) => {
                                     value={formik.values.title}
                                     onChange={handleProductData}
                                     isValid={formik.touched.title && !formik.errors.title}
-                                    isInvalid={formik.touched.title && !!formik.errors.title}
+                                    isInvalid={formik.touched.title && !!formik.errors.title && props.type != "massEdit"}
                                 />
                                 <Form.Control.Feedback type="invalid" tooltip>
                                     {formik.errors.title}
@@ -200,7 +218,7 @@ const ProductForm = (props) => {
                                     value={formik.values.price}
                                     onChange={handleProductData}
                                     isValid={formik.touched.price && !formik.errors.price}
-                                    isInvalid={formik.touched.price && !!formik.errors.price}
+                                    isInvalid={formik.touched.price && !!formik.errors.price && props.type != "massEdit"}
                                 />
                                 <Form.Control.Feedback type="invalid" tooltip>
                                     {formik.errors.price}
@@ -222,7 +240,7 @@ const ProductForm = (props) => {
                                     value={formik.values.description}
                                     onChange={handleProductData}
                                     isValid={formik.touched.description && !formik.errors.description}
-                                    isInvalid={formik.touched.description && !!formik.errors.description}
+                                    isInvalid={formik.touched.description && !!formik.errors.description && props.type != "massEdit"}
                                 />
                                 <Form.Control.Feedback type="invalid" tooltip>
                                     {formik.errors.description}
@@ -252,34 +270,38 @@ const ProductForm = (props) => {
                     <Row className="mb-3">
                         <NewTagForm handleTags={handleNewTag} tagsData={currentTags} />
                     </Row>
-                    <Row>
-                        <Form.Group className="position-relative mb-3">
-                            <Form.Label>Image</Form.Label>
-                            <Form.Control
-                                type="file"
-                                accept='image/*'
-                                required
-                                name="file"
-                                aria-label="File"
-                                onChange={handleImage}
-                                isValid={formik.touched.file && image}
-                                isInvalid={formik.touched.file && !image && !props.data}
-                            />
-                            <Form.Control.Feedback type="invalid" tooltip>
-                                {formik.errors.file}
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <ProductImage 
-                            src={image ? URL.createObjectURL(image) : props.data ? props.data.image_url : img_placeholder}
-                            thumbnail
-                        />
-                    </Row>
+                    {
+                        props.type != "massEdit" ? 
+                                <Row>
+                                    <Form.Group className="position-relative mb-3">
+                                        <Form.Label>Image</Form.Label>
+                                        <Form.Control
+                                            type="file"
+                                            accept='image/*'
+                                            required
+                                            name="file"
+                                            aria-label="File"
+                                            onChange={handleImage}
+                                            isValid={formik.touched.file && image}
+                                            isInvalid={formik.touched.file && !image && !props.data}
+                                        />
+                                        <Form.Control.Feedback type="invalid" tooltip>
+                                            {formik.errors.file}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                    <ProductImage 
+                                        src={image ? URL.createObjectURL(image) : props.data ? props.data.image_url : img_placeholder}
+                                        thumbnail
+                                    />
+                                </Row>
+                            : <></>
+                    }
                     <Row>
                         <Col>
                             <Button disabled={loading} type="submit">{!loading ? "Submit" : "Submitting..."}</Button>
                         </Col>
                         {
-                            props.type != "add" ?
+                            (props.type != "add" && props.type != "massEdit") ?
                                     <Col className="d-flex">
                                         <Button className="ms-auto" disabled={loading} variant="danger" onClick={handleDeleteProduct}>Delete</Button>
                                     </Col>
