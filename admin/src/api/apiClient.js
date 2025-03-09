@@ -147,6 +147,23 @@ class API_Client {
         }
     }
 
+    static async updateManyProducts(formData) {
+        try {
+            return await fetch(`${import.meta.env.VITE_API_URL}/products/update-many`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'applicatoin/json',
+                },
+                body: formData,
+            }).then((res)=>res.json());
+        } catch (err) {
+            return {
+                success: false,
+                error: err
+            }
+        }
+    }
+
     static async updateDefaultSettingsProduct(data) {
         const formData = new FormData();
         formData.append('product_id', import.meta.env.VITE_PRODUCT_DEFAULT_SETTINGS_ID);
@@ -175,13 +192,9 @@ class API_Client {
 
     static async deleteProducts(productIds) {
         const formData = new FormData();
-        console.log(productIds)
         for (const item in productIds) {
-            console.log(productIds[item])
             formData.append('product_ids[]', productIds[item]);
         }
-        for (const pair of formData.entries())
-            console.log(pair)
 
         try {
             return await fetch(`${import.meta.env.VITE_API_URL}/products/delete`, {
