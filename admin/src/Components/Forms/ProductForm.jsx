@@ -14,6 +14,8 @@ import API_Client from "../../api/apiClient";
 import img_placeholder from '../../assets/images_placeholder.png'
 import ResultToast from "../ResultToast";
 
+// TODO: make new files for each part of the 
+
 const ProductImage = styled(Image)`
     max-width: 100%;
     width: 300px;
@@ -27,11 +29,27 @@ const ProductForm = (props) => {
     const descriptionRef = useRef(null);
     const [productData, setProductData] = useState({
         title: props.data?.title ?? '',
+        price: props.data?.price ?? '',
         description: props.data?.description ?? '',
-        price: props.data?.price ?? 0,
+        tags: props.data?.tags ?? [],
+        image: false
     });
-    const [tags, setTags] = useState(props.data?.tags ?? []);
-    const [image, setImage] = useState(false);
+    const [formValidity, setFormValidity] = useState({
+        touched: {
+            title: false,
+            price: false,
+            description: false,
+            image: false
+        },
+        errors: {
+            title: true,
+            price: true,
+            description: true,
+            image: true
+        }
+    })
+    // const [tags, setTags] = useState(props.data?.tags ?? []);
+    // const [image, setImage] = useState(false);
     const [loading, setLoading] = useState(false);
     const [currentTags, setCurrentTags] = useState([]);
     const [portfolioOptions, setPortfolioOptions] = useState([]);
@@ -39,71 +57,21 @@ const ProductForm = (props) => {
     const [formResult, setFormResult] = useState({ success: false});
     const [formSuccessMessage, setFormSuccessMessage] = useState("You have successfully saved this product.");
 
-    const formik = useFormik({
-        initialValues: {
-            title: props.data?.title ?? '',
-            description: props.data?.description ?? '',
-            price: props.data?.price ?? '',
-            file: props.data?.image_url ?? null,
-        },
-        validationSchema: yup.object().shape({
-            title: yup.string(),
-            description: yup.string(),
-            price: yup.number(),
-            file: yup.mixed(),
-        }),
-        onSubmit: async (e) => {
-            console.log("submit")
-            let response;
-            setLoading(true);
-            try {
-                if (props.type != "massEdit" && !portfolioOptions.some(option => tags.includes(option))) {
-                    throw new Error("You must choose a portfolio!")
-                }
-
-                const formData = new FormData();
-                if (props.type == "massEdit")
-                    for (const i in props.selectedProducts)
-                        formData.append('product_ids[]', props.selectedProducts[i])
-                (props.data && props.type != "massEdit") && formData.append('product_id', props.data._id);
-                for (const i in productData) {
-                    formData.append(i, productData[i]);
-                }
-                for (const i in tags) {
-                    formData.append('tags[]', tags[i]);
-                }
-                if (image) {
-                    formData.append('file', image);
-                } else if (!props.data) {
-                    throw new Error("You must choose a product image!");
-                }
-
-                for (const pair of formData.entries()) {
-                    console.log(pair[0], pair[1])
-                }
-    
-                switch (props.type) {
-                    case "add":
-                        response = await API_Client.addNewProduct(formData);
-                        break;
-                    case "massEdit":
-                        response = await API_Client.updateManyProducts(formData);
-                        break;
-                    default:
-                        response = await API_Client.updateProduct(formData);
-                }
-    
-                if (!response.success) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-            } catch (err) {
-                console.error('Error:', err);
-                alert(err);
-            }
-            (response.success != undefined) && handleToastOpen(response, formSuccessMessage);
-            setLoading(false);
-        }
-    });
+    // const formik = useFormik({
+    //     initialValues: {
+    //         title: props.data?.title ?? '',
+    //         description: props.data?.description ?? '',
+    //         price: props.data?.price ?? '',
+    //         file: props.data?.image_url ?? null,
+    //     },
+    //     validationSchema: yup.object().shape({
+    //         title: yup.string(),
+    //         description: yup.string(),
+    //         price: yup.number(),
+    //         file: yup.mixed(),
+    //     }),
+    //     onSubmit: 
+    // });
 
     /** HANDLERS */
 
@@ -115,37 +83,76 @@ const ProductForm = (props) => {
 
     const handleToastClose = () => setShowResToast(false);
 
-    const handleProductData = (e) => {
-        formik.handleChange(e);
-        setProductData({ ...productData, [e.target.name]: e.target.value });
+    const handleProductData = (e, name, value) => {
+        let pair = { name: name, value: value };
+        if (!!e) {
+            if (e.target.name != 'image')
+                pair = { name: e.target.name, value: e.target.value };
+            else
+                pair = { name: e.target.name, value: e.target.files[0] };
+        }
+        setProductData({ ...productData, [pair.name]: pair.value });
+        setFormValidity(handleFormValidity(pair.name, pair.value));
     };
 
+    const handleFormValidity = (name, value, validity=formValidity) => {
+        validity = { ...validity, ["touched"]: { ...validity.touched, [name]: true }};
+        let isInvalid = false;
+        switch (name) {
+            case 'title':
+            case 'description':
+                isInvalid = value.length == 0;
+                break;
+            case 'price':
+                isInvalid = value.length == 0 || typeof (+value) !== 'number' || !Number.isFinite(+value);
+                break;
+            case 'image':
+                isInvalid = !value && !props.data;
+                break;
+        }
+        validity = { ...validity, ["errors"]: { ...validity.errors, [name]: (props.type != "massEdit") ? isInvalid : false }};
+        return validity;
+    }
+
+    const handleFormatPrice = (e) => {
+        const price = (!!e) ? e.target.value : productData.price.toString();
+        let formattedPrice = price;
+        if (!formValidity.errors.price && !price.match(/^[1-9][0-9]*\.[0-9]{2}$/)) {
+            while (formattedPrice.startsWith('0'))
+                formattedPrice = formattedPrice.substring(1);
+            if (formattedPrice.indexOf('.') != -1) {
+                while (formattedPrice.length < formattedPrice.indexOf('.')+3)
+                    formattedPrice = formattedPrice + '0';
+                formattedPrice = formattedPrice.substring(0, formattedPrice.indexOf('.')+3);
+            } else {
+                formattedPrice = formattedPrice + '.00';
+            }
+            handleProductData(null, 'price', formattedPrice);
+        }
+        return formattedPrice;
+    }
+
     const handleTags = (e) => {
-        formik.handleChange(e);
-        let changedTags = tags;
+        // formik.handleChange(e);
+        let changedTags = productData.tags;
         if (e.target.checked) {
             if (e.target.value.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX))
                 changedTags = changedTags.filter(tag => !tag.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX))
             changedTags.push(e.target.value)
-            setTags(changedTags);
+            handleProductData(null, "tags", changedTags);
         } else {
-            setTags(changedTags.filter(tag => tag != e.target.value));
+            handleProductData(null, "tags", changedTags.filter(tag => tag != e.target.value));
         }
     }
 
     const handleNewTag = (newTag) => {
-        let changedTags = tags;
-        if (tags.indexOf(newTag) === -1) {
+        let changedTags = productData.tags;
+        if (productData.tags.indexOf(newTag) === -1) {
             changedTags.push(newTag)
-            setTags(changedTags);
+            handleProductData(null, "tags", changedTags);
         } else {
-            setTags(changedTags.filter(tag => tag != newTag));
+            handleProductData(null, "tags", changedTags.filter(tag => tag != newTag));
         }
-    }
-
-    const handleImage = (e) => {
-        formik.handleChange(e);
-        setImage(e.target.files[0]);
     }
 
     const handleDeleteProduct = async () => {
@@ -154,6 +161,97 @@ const ProductForm = (props) => {
             const res = await API_Client.deleteProducts([props.data._id]);
             handleToastOpen(res, `Successfully deleted "${props.data.title}"`)
         }
+        setLoading(false);
+    }
+
+    const handleFormData = () => {
+        /** Validity Check */
+        let validity = formValidity;
+        for (const key in productData) {
+            validity = handleFormValidity(key, productData[key], validity)
+            if (validity.errors[key]) {
+                setFormValidity(validity);
+                throw new Error(`You must fill out the form for the ${key}.`)
+            }
+        }
+        setFormValidity(validity);
+
+        if (props.type != "massEdit" && !portfolioOptions.some(option => productData.tags.includes(option))) {
+            console.log(productData.tags)
+            throw new Error("You must choose a portfolio.")
+        }
+
+        if (props.type != "massEdit" && productData.tags.filter(tag => !tag.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX)).length == 0) {
+            throw new Error(`You must choose at least 1 tag.`);
+        }
+
+        if (!!productData.file && !props.data) {
+            throw new Error("You must choose a product image!");
+        }
+
+        /** Create Form Data */
+        const formData = new FormData();
+
+        if (props.type == "massEdit") {
+            for (const i in props.selectedProducts) {
+                formData.append('product_ids[]', props.selectedProducts[i]._id)
+            }
+        }
+        
+        (props.data && props.type != "massEdit") && formData.append('product_id', props.data._id);
+
+        for (const key in productData) {
+            if (key != 'tags') {
+                if (key == 'image' && props.type != "massEdit")
+                    formData.append('file', productData[key])
+                else if (key == 'price')
+                    formData.append(key, handleFormatPrice())
+                else
+                    formData.append(key, productData[key])
+            }
+            else {
+                for (const i in productData[key])
+                    formData.append(`${key}[]`, productData[key][i])
+            }
+        }
+
+        for (const pair of formData.entries()) {
+            console.log(pair[0], pair[1])
+        }
+
+        return formData;
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("submit")
+        let response;
+        setLoading(true);
+        try {
+            const formData = handleFormData();
+
+            switch (props.type) {
+                case "add":
+                    response = await API_Client.addNewProduct(formData);
+                    break;
+                case "edit":
+                    response = await API_Client.updateProduct(formData);
+                    break;
+                case "massEdit":
+                    response = await API_Client.updateManyProducts(formData);
+                    break;
+                default:
+                    throw new Error(`props.type error: ${props.type} is not a valid type for a product form`)
+            }
+
+            if (!response.success) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            response = { success: false, error: response?.error ?? err.message };
+        }
+        handleToastOpen(response, formSuccessMessage);
         setLoading(false);
     }
 
@@ -177,15 +275,15 @@ const ProductForm = (props) => {
     }, [productData.description]);
 
     useEffect(()=>{
-        setPortfolioOptions(tags.filter(tag => tag.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX)))
-    }, [tags])
+        setPortfolioOptions(productData.tags.filter(tag => tag.startsWith(import.meta.env.VITE_PORTFOLIO_TAG_PREFIX)))
+    }, [productData.tags])
         
     return (
         <>
             <div>
                 <h1>{props.data?.title ?? "Add Product"}</h1>
                 <hr></hr>
-                <Form noValidate onSubmit={formik.handleSubmit}>
+                <Form noValidate onSubmit={handleSubmit}>
                     <Row className="mb-3">
                         <Form.Group as={Col} md="4" >
                             <Form.Label>Title</Form.Label>
@@ -195,13 +293,13 @@ const ProductForm = (props) => {
                                     name="title"
                                     placeholder="Title"
                                     aria-label="Title"
-                                    value={formik.values.title}
+                                    value={productData.title}
                                     onChange={handleProductData}
-                                    isValid={formik.touched.title && !formik.errors.title}
-                                    isInvalid={formik.touched.title && !!formik.errors.title && props.type != "massEdit"}
+                                    isValid={formValidity.touched.title && !formValidity.errors.title}
+                                    isInvalid={formValidity.touched.title && formValidity.errors.title}
                                 />
                                 <Form.Control.Feedback type="invalid" tooltip>
-                                    {formik.errors.title}
+                                    title is required
                                 </Form.Control.Feedback>
                             </InputGroup>
                         </Form.Group>
@@ -215,13 +313,14 @@ const ProductForm = (props) => {
                                     name="price"
                                     placeholder="0.00"
                                     aria-label="Price"
-                                    value={formik.values.price}
+                                    value={productData.price}
                                     onChange={handleProductData}
-                                    isValid={formik.touched.price && !formik.errors.price}
-                                    isInvalid={formik.touched.price && !!formik.errors.price && props.type != "massEdit"}
+                                    onBlur={handleFormatPrice}
+                                    isValid={formValidity.touched.price && !formValidity.errors.price}
+                                    isInvalid={formValidity.touched.price && formValidity.errors.price}
                                 />
                                 <Form.Control.Feedback type="invalid" tooltip>
-                                    {formik.errors.price}
+                                    price is required and must be a numer
                                 </Form.Control.Feedback>
                             </InputGroup>
                         </Form.Group>
@@ -237,13 +336,13 @@ const ProductForm = (props) => {
                                     name="description"
                                     placeholder="Description"
                                     aria-label="Description"
-                                    value={formik.values.description}
+                                    value={productData.description}
                                     onChange={handleProductData}
-                                    isValid={formik.touched.description && !formik.errors.description}
-                                    isInvalid={formik.touched.description && !!formik.errors.description && props.type != "massEdit"}
+                                    isValid={formValidity.touched.description && !formValidity.errors.description}
+                                    isInvalid={formValidity.touched.description && formValidity.errors.description}
                                 />
                                 <Form.Control.Feedback type="invalid" tooltip>
-                                    {formik.errors.description}
+                                    description is required
                                 </Form.Control.Feedback>
                             </InputGroup>
                         </Form.Group>
@@ -279,18 +378,17 @@ const ProductForm = (props) => {
                                             type="file"
                                             accept='image/*'
                                             required
-                                            name="file"
-                                            aria-label="File"
-                                            onChange={handleImage}
-                                            isValid={formik.touched.file && image}
-                                            isInvalid={formik.touched.file && !image && !props.data}
+                                            name="image"
+                                            onChange={handleProductData}
+                                            isValid={formValidity.touched.image && !formValidity.errors.image}
+                                            isInvalid={formValidity.touched.image && formValidity.errors.image}
                                         />
                                         <Form.Control.Feedback type="invalid" tooltip>
-                                            {formik.errors.file}
+                                            file is required
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                     <ProductImage 
-                                        src={image ? URL.createObjectURL(image) : props.data ? props.data.image_url : img_placeholder}
+                                        src={productData.image ? URL.createObjectURL(productData.image) : props.data ? props.data.image_url : img_placeholder}
                                         thumbnail
                                     />
                                 </Row>
@@ -310,6 +408,7 @@ const ProductForm = (props) => {
                     </Row>
                 </Form>
             </div>
+
             <ResultToast
                 show={showResToast}
                 onClose={handleToastClose}

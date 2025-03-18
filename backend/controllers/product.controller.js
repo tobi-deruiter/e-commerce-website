@@ -198,7 +198,7 @@ class ProductController {
             const products = await Product.find({
                 _id: { $in: productData.product_ids }
             });
-                        
+
             await Product.deleteMany({
                 _id: { $in: productData.product_ids }
             });
@@ -260,13 +260,10 @@ class ProductController {
             const title = (!productData.title) ? "$title" : productData.title;
             const description = (!productData.description) ? "$description" : productData.description;
             const tags = (!productData.tags) ? "$tags" : productData.tags;
-            const price = (!productData.price) ? "$price" : productData.price;
+            const price = (!productData.price || productData.price == '') ? "$price" : Number(productData.price);
             const available = (!productData.available) ? "$available" : productData.available;
             const quantity = (!productData.quantity) ? "$quantity" : productData.quantity;
     
-            console.log(tags);
-            console.log(productData.product_ids)
-
             await Product.updateMany(
                 {
                     _id: { $in: productData.product_ids }

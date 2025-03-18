@@ -97,7 +97,17 @@ const Item = (props) => {
                     <ImgContainer>
                         <Img variant="top" src={props.data.image_url} />
                     </ImgContainer>
-                    <ProductTitle>${props.data.price}</ProductTitle>
+                    <ProductTitle>
+                        ${
+                            (props.data.price.toString().match(/^[1-9][0-9]*\.[0-9]$/)) ?
+                                    props.data.price.toString() + '0'
+                                :
+                                    (!props.data.price.toString().match(/^[1-9][0-9]*\.[0-9]{2}$/)) ?
+                                            props.data.price.toString() + '.00'
+                                        :
+                                            props.data.price
+                        }
+                    </ProductTitle>
                     <ProductCard.Text>{props.data.description}</ProductCard.Text>
                 </ProductBody>
             </ProductCard>
@@ -108,7 +118,7 @@ const Item = (props) => {
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     <Container>
-                        <ProductForm data={props.data} />
+                        <ProductForm type="edit" data={props.data} />
                     </Container>
                 </Offcanvas.Body>
             </OffcanvasEditForm>
