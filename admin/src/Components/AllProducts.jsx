@@ -96,7 +96,6 @@ const AllProducts = (props) => {
             selected = selected.filter(product => product._id != data._id);
             setSelectedProducts(selected);
         }
-        selected.length > 0 && console.log(selected);
     }
 
     const handleSelectAll = () => {
@@ -109,11 +108,12 @@ const AllProducts = (props) => {
     }
 
     const handleMassEdit = () => {
-        (selectedProducts.length > 0) && setShowMassEditForm(true);
+        (selectMany && selectedProducts.length > 0) && setShowMassEditForm(true);
     }
 
     const handleMassDelete = async () => {
-        if (selectedProducts.length > 0 && confirm(`Are you sure you would like to delete all the selected products?\n\nTHIS IS A PERMANENT ACTION`)) {
+        if (selectMany && selectedProducts.length > 0 &&
+        confirm(`Are you sure you would like to delete all the selected products?\n\nTHIS IS A PERMANENT ACTION`)) {
             const res = await API_Client.deleteProducts(selectedProducts.map(product => product._id));
             handleToastOpen(res, `Successfully deleted ${selectedProducts.length} products.`)
         }
@@ -174,16 +174,23 @@ const AllProducts = (props) => {
                         />
                     </TitleCol>
                 </Row>
-                <SelectionOptionsRow style={{ maxHeight: selectMany ? "200px" : "0", opacity: selectMany ? "100" : "0"}}>
+                <SelectionOptionsRow
+                    style={{
+                        maxHeight: selectMany ? "200px" : "0",
+                        opacity: selectMany ? "100" : "0",
+                        userSelect: "none"
+                    }}
+                >
                     <SelectionsOptionsContainer>
-                        <h6>Selection Options</h6>
+                        <h6 disabled={!selectMany} >Selection Options</h6>
                         <Form.Check
                             type="checkbox"
                             label="Select All"
+                            disabled={!selectMany}
                             onChange={handleSelectAll}
                         />
-                        <Button onClick={handleMassEdit} >Mass Edit</Button>
-                        <Button onClick={handleMassDelete} variant="danger" >Delete</Button>
+                        <Button onClick={handleMassEdit} disabled={!selectMany} >Mass Edit</Button>
+                        <Button onClick={handleMassDelete} disabled={!selectMany} variant="danger" >Delete</Button>
                     </SelectionsOptionsContainer>
                 </SelectionOptionsRow>
                 <hr></hr>

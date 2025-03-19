@@ -14,8 +14,6 @@ import API_Client from "../../api/apiClient";
 import img_placeholder from '../../assets/images_placeholder.png'
 import ResultToast from "../ResultToast";
 
-// TODO: make new files for each part of the 
-
 const ProductImage = styled(Image)`
     max-width: 100%;
     width: 300px;
