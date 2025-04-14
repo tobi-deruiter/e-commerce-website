@@ -4,7 +4,7 @@ import Image from 'react-bootstrap/Image';
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import styled from'styled-components';
-import computer_logo from './Assets/hero-logo.png';
+import computer_logo from '../Assets/hero-logo.png';
 import { Link } from "react-router-dom";
 import ThemeButton from "./Pieces/ThemeButton";
 

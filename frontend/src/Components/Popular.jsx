@@ -2,7 +2,7 @@ import React from "react"
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import styled from 'styled-components';
-import product_img from "./Assets/item-img-placeholder.png"
+import product_img from "../Assets/item-img-placeholder.png"
 import Item from "./Item";
 
 var data = []

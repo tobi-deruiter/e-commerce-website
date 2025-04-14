@@ -5,7 +5,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import Image from 'react-bootstrap/Image';
 import { Link } from 'react-router-dom';
 import styled from'styled-components';
-import main_logo from "./Assets/main-logo.png";
+import main_logo from "../Assets/main-logo.png";
 
 const StyledNav = styled(Navbar)`
     color: ${props => props.theme.black};

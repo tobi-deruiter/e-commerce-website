@@ -4,7 +4,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from 'react-bootstrap/Image';
 import styled from'styled-components';
-import main_logo from "./Assets/main-logo.png"
+import main_logo from "../Assets/main-logo.png"
 import { Link } from "react-router-dom";
 
 const FooterContainer = styled(Container)`
